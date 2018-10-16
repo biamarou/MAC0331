@@ -57,3 +57,21 @@ def reset_count ():
 	global num_area2, num_dist
 	num_area2 = 0
 	num_dist = 0
+
+def proper_intersection (a, b, c, d):
+	"Verifica se ha intersecao entre os segmentos ab e cd em um ponto interno a ambos"
+	if (collinear(a, b, c) or collinear(a, b, d) or collinear(c, d, a) or collinear(c, d, b)):
+		return False
+	return (bool(left(a, b, c)) ^ bool(left(a, b, d))) and (bool(left(c, d, a)) ^ bool(left(c, d, b)))
+
+def between (a, b, c):
+	"Verifica se o ponto c estah no segmento ab"
+	if (not collinear(a, b, c)): return False
+	if (a.x != b.x): 
+		return a.x <= c.x <= b.x or b.x <= c.x <= a.x
+	else:
+		return a.y <= c.y <= b.y or b.y <= c.y <= a.y
+
+def intersect (a, b, c, d):
+	if (proper_intersection(a, b, c, d)): return True
+	return between(a, b, c) or between(a, b, d) or between(c, d, a) or between(c, d, b)
