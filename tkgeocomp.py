@@ -258,8 +258,8 @@ class App:
 		else:
 			epsfile = self.current_filename + '-' + \
 				  repr(self.file_cont) + '.eps'
-			self.canvas.postscript (file=epsfile)
-			self.file_cont = self.file_cont + 1
+		self.canvas.postscript (file=epsfile)
+		self.file_cont = self.file_cont + 1
 		        
 	
 	def run_algorithm (self, alg, widget, alg_name):
