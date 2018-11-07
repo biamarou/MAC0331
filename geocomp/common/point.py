@@ -46,7 +46,7 @@ class Point:
 	
 	def lineto (self, p, color=config.COLOR_LINE):
 		"Desenha uma linha ate um ponto p na cor especificada"
-		self.lineto_id[p] = control.plot_line (self.x, self.y, p.x, p.y, color)
+		self.lineto_id[p] = control.plot_segment (self.x, self.y, p.x, p.y, color)
 		return self.lineto_id[p]
 	
 	def remove_lineto (self, p, id = None):
