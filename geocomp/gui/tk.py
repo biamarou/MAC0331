@@ -148,6 +148,24 @@ def plot_horiz_line (y, color, linewidth):
 					   fill=color, width=linewidth)
 	return lineto_id
 
+def plot_parabola(y,px,py,startx,endx,steps,color,linewidth):
+	if startx == endx:
+		line_id = canvas.create_line (px,py,px,y,color=color,width=linewidth)
+		return line_id
+	if startx > endx:
+		startx,endx = endx,startx
+	Dx = (endx - startx)/(steps)
+	x = startx
+	curve = []
+	for i in range(steps+1):
+		yn = (px*px - 2*px*x + x*x + py*py - y*y)/(2*(py-y))
+		curve.append(canvas.r2cx(x))
+		curve.append(canvas.r2cy(yn))
+		print(x,yn)
+		x = x + Dx
+	line_id = canvas.create_line (curve,fill=color,width=linewidth)
+	return line_id
+
 def plot_delete (id):
 	canvas.delete (id)
 
