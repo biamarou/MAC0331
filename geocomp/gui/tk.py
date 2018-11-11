@@ -161,7 +161,6 @@ def plot_parabola(y,px,py,startx,endx,steps,color,linewidth):
 		yn = (px*px - 2*px*x + x*x + py*py - y*y)/(2*(py-y))
 		curve.append(canvas.r2cx(x))
 		curve.append(canvas.r2cy(yn))
-		print(x,yn)
 		x = x + Dx
 	line_id = canvas.create_line (curve,fill=color,width=linewidth)
 	return line_id
