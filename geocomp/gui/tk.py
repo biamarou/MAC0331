@@ -150,7 +150,7 @@ def plot_horiz_line (y, color, linewidth):
 
 def plot_parabola(y,px,py,startx,endx,steps,color,linewidth):
 	if startx == endx:
-		line_id = canvas.create_line (px,py,px,y,color=color,width=linewidth)
+		line_id = canvas.create_line (px,py,px,y,fill=color,width=linewidth)
 		return line_id
 	if startx > endx:
 		startx,endx = endx,startx
