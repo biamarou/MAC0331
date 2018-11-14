@@ -17,7 +17,10 @@ def area2 (a, b, c):
 	"Retorna duas vezes a rea do tringulo determinado por a, b, c"
 	global num_area2
 	num_area2 = num_area2 + 1
-	return (b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)
+	area = (b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)
+	# Descobrir como aproximar pra zero no ponto de intersec
+	#if (abs(area) < 1.0e-13): area = 0
+	return area
 
 def left (a, b, c):
 	"Verdadeiro se c est  esquerda do segmento orientado ab"
@@ -25,6 +28,7 @@ def left (a, b, c):
 
 def left_on (a, b, c):
 	"Verdadeiro se c est  esquerda ou sobre o segmento orientado ab"
+	print(area2 (a, b, c))
 	return area2 (a, b, c) >= 0
 
 def collinear (a, b, c):
