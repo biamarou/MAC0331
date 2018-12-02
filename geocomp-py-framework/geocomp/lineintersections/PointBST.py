@@ -41,6 +41,7 @@ class PointBST:
         self.remove(node.key)
         return node
     
+
     def insert (self, point, segment):
         #We pass the segments of which the point is a vertice
         if (self.root == None):
@@ -56,6 +57,7 @@ class PointBST:
         return 0
 
     # Assuming there aren't two equal points
+    # se tiver ponto igual os ponta esquerda sao menores
     def insert_aux (self, node, point, segment):
         if (node == None):
             return self.Node(point, 0, 1, None, None, segment)

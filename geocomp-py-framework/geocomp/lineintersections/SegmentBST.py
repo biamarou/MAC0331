@@ -41,8 +41,8 @@ class SegmentBST:
         left_test = prim.left(s.init, s.to, p)
         left_on_test = prim.left_on(s.init, s.to, p)
 
-        if (left_test): return 1
-        elif (left_on_test): return 0
+        if (left_on_test): return 0
+        elif (left_test): return 1
         else: return -1
 
     def insert (self, segment, sweepline_point): #sweepline_point eh a x-coordenada da sweepline
@@ -106,89 +106,95 @@ class SegmentBST:
         return self.contains_aux(self.root, segment, sweepline_point)
 
     def contains_aux(self, node, segment, sweepline_point):
-        #print("to procurando")
         if (node == None):
             return False
+        
         cmp = self.compare_to(sweepline_point, node.key)
-        #print(cmp)
-        if (cmp < 0 or (cmp == 0 and segment != node.key)):
-            #print("achei primeiro seg")
-            self.contains_aux(node.left, segment, sweepline_point)
+        if (cmp < 0):
+            return self.contains_aux(node.left, segment, sweepline_point)
         elif (cmp > 0):
-            self.contains_aux(node.right, segment, sweepline_point)
+            return self.contains_aux(node.right, segment, sweepline_point)
         else:
              return True
 
+    # cuidado com mais de um ponto acabando num extremo
+
     def get_predecessor(self, key, sweepline_point): 
-    #    se o noh tem subarvore esquerda :min(subarvore esquerda)
+    #    se o noh tem subarvore esquerda :max(subarvore esquerda)
     #                       cc se sou filho direito, meu pai eh antecessor
     #                       cc nao tenho antecessor
         node = self.root
-        node_dad = None
-        
+        last_turn_right = None
+
+        if (node == None):
+            print("A RAIZ E NULL!")
+
+        if (sweepline_point.x == 83.0 and sweepline_point.y == 25.0):
+            print('------------BUSCANDO PREDECESSOR-------------')
         while (node != None):
-
             cmp = self.compare_to(sweepline_point, node.key)
-
+            if (sweepline_point.x == 83.0 and sweepline_point.y == 25.0):
+                print('node.key: (' + str(node.key.init.x) + ', ' + str(node.key.init.y) + '), (' + str(node.key.to.x) +', ' + str(node.key.to.y)+ ')')
+                print('cmp(sweepline_point, node.key) = ' + str(cmp))
             if(cmp > 0):
-                node_dad = node
+                last_turn_right = node
                 node = node.right
             elif(cmp < 0 or (cmp == 0 and key != node.key)):
-                node_dad = node
                 node = node.left
             else:
                 break
 
         if (node.left != None): 
             return self.max_aux(node.left)
-        else:
-            if (node_dad != None):
-                if(node_dad.right != None and node_dad.right.key == key):
-                    return node_dad
+        
+        elif(last_turn_right != None):
+                return last_turn_right
         return False
 
     def get_sucessor(self, key, sweepline_point): 
-    #    se o noh tem subarvore direita :max(subarvore direita)
+    #    se o noh tem subarvore direita :min(subarvore direita)
     #                       cc se sou filho esquerdo, meu pai eh sucessor
     #                       cc nao tenho sucessor
         node = self.root
-        node_dad = None
+        last_turn_left = None
 
         while (node != None):
 
             cmp = self.compare_to(sweepline_point, node.key)
             if(cmp > 0):
-                node_dad = node
                 node = node.right
             elif(cmp < 0 or (cmp == 0 and key != node.key)):
-                node_dad = node
+                last_turn_left = node
                 node = node.left
             else:
                 break
 
         if (node.right != None):
             return self.min_aux(node.right)
-        else:
-            if (node_dad != None):
-                if(node_dad.left != None and node_dad.left.key == key):
-                    return node_dad
+    
+        elif (last_turn_left != None):
+            return last_turn_left
         return False
 
 
     def remove(self, segment, sweepline_point):
         if (self.contains(segment, sweepline_point)):
-            #print("There is a point, we should remove it!")
             self.root = self.remove_aux(self.root, segment, sweepline_point)
+        else:
+            print("There is no point!")
+            print(segment)
 
     #Assuming there aren`t two equal segments  
     def remove_aux(self, node, segment, sweepline_point):
         
         cmp = self.compare_to(sweepline_point, node.key)
         
-        if (cmp < 0 or (cmp == 0 and segment != node.key)): 
+        if (cmp < 0): 
             node.left = self.remove_aux(node.left, segment, sweepline_point)
         elif (cmp > 0): node.right = self.remove_aux(node.right, segment, sweepline_point)
         else:
+            print("achei o segmento!")
+            print(node.key)
             if (node.left == None):
                 return node.right
     
