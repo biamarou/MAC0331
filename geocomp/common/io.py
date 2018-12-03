@@ -1,45 +1,51 @@
 #!/usr/bin/env python
 """Modulo para leitura de um arquivo de dados"""
 
-from .point import Point
+from geocomp.common.point   import Point
+from geocomp.common.polygon import Polygon
+from geocomp.common.segment import Segment
 
-def open_file (name):
-	"""Le o arquivo passado, e retorna o seu conteudo
-	
-	Atualmente, ele espera que o arquivo contenha uma lista de pontos,
-	um ponto por linha, as duas coordenadas em cada linha. Exemplo:
-	
-	0 0
-	0 1
-	10 100
-	
-	"""
-	f = open (name, 'r')
-	#t = range (5000)
-	lista = []
-	cont = 0
 
-	for linha in f.readlines ():
-		if linha[0] == '#': continue
+def read(filename):
+    with open(filename) as file:
+        i = 0
+        vertices = []
+        data = []
+        expecting_polygon = False
+        for line in file:
+            i += 1
+            line = line.split()
+            if len(line) == 0 or line[0] == "#":
+                continue
+            if line[0] == "[":
+                expecting_polygon = True
+            elif line[0] == "]":
+                expecting_polygon = False
+                data.append(Polygon(vertices))
+                vertices = []
+            elif len(line) == 4:
+                data.append(
+                    Segment(
+                        Point(float(line[0]), float(line[1])),
+                        Point(float(line[2]), float(line[3]))
+                    )
+                )
+            elif len(line) == 2:
+                if expecting_polygon:
+                    vertices.append(Point(float(line[0]), float(line[1])))
+                else:
+                    data.append(Point(float(line[0]), float(line[1])))
+            else:
+                raise ValueError(
+                    "Invalid input from file: {}: line: {}: {}".format(filename, i, line))
+        return data
 
-		coord = linha.split()
-
-		fields = len (coord)
-		if fields == 0: continue
-		if fields != 2: raise 'cada linha deve conter 2 coordenadas'
-
-		x = float (coord[0])
-		y = float (coord[1])
-		lista.append (Point (x, y))
-
-	return lista
-
-if __name__ == '__main__':
-	import sys
-
-	for i in sys.argv[1:]:
-		print((i,':'))
-		lista = open_file (i)
-		print(('  ',repr(len(lista)), 'pontos:'))
-		for p in lista:
-			print(p)
+# if __name__ == '__main__':
+#     import sys
+#
+#     for i in sys.argv[1:]:
+#         print((i,':'))
+#         lista = read_points (i)
+#         print(('  ',repr(len(lista)), 'pontos:'))
+#         for p in lista:
+#             print(p)
