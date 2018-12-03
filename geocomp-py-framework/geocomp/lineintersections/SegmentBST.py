@@ -56,10 +56,25 @@ class SegmentBST:
         if (node == None):
             return self.Node(segment, 0, 1, None, None)
         cmp = self.compare_to(sweepline_point, node.key)
-        if (cmp <= 0):
+        if (cmp < 0):
             node.left = self.insert_aux(node.left, segment, sweepline_point)
         elif (cmp > 0):
             node.right = self.insert_aux(node.right, segment, sweepline_point)
+
+        else: #deu igual!
+            if (node.key.init == segment.init):
+                cmp = self.compare_to(key.to, node.key)
+            elif (node.key.init == segment.to):
+                cmp = -self.compare_to(segment.init, node.key)
+            elif (node.key.to == segment.init):
+                cmp = self.compare_to(segment.to, node.key)
+            else:
+                cmp = self.compare_to(segment.init, node.key)
+
+            if (cmp < 0):
+                node.left = self.insert_aux(node.left, segment, sweepline_point)
+            else: 
+                node.right = self.insert_aux(node.right, segment, sweepline_point)
 
         node.size = 1 + self.size_aux(node.left) + self.size_aux(node.right)
         node.height = 1 + max(self.height_aux(node.left), self.height_aux(node.right))
@@ -101,48 +116,63 @@ class SegmentBST:
         node2.height = 1 + max(self.height_aux(node2.left), self.height_aux(node2.right))
         return node2
 
-    def contains(self, segment, sweepline_point):
-        if (segment == None): return False
-        return self.contains_aux(self.root, segment, sweepline_point)
+    #def contains(self, segment, sweepline_point):
+    #    if (segment == None): return False
+    #    return self.contains_aux(self.root, segment, sweepline_point)
 
-    def contains_aux(self, node, segment, sweepline_point):
-        if (node == None):
-            return False
+    #def contains_aux(self, node, segment, sweepline_point):
+    #    if (node == None):
+    #        return False
+        
+   #     cmp = self.compare_to(sweepline_point, node.key)
+    #    if (cmp < 0):
+    #        return self.contains_aux(node.left, segment, sweepline_point)
+    #    elif (cmp > 0):
+       #     return self.contains_aux(node.right, segment, sweepline_point)
+      #  else:
+      #       return True
+
+    def search_node(self, node_dad, node, key, sweepline_point, last_turn_left, last_turn_right):
+        
+        if(node == None): return None
         
         cmp = self.compare_to(sweepline_point, node.key)
+        print ("cmp begin " + str(cmp))
         if (cmp < 0):
-            return self.contains_aux(node.left, segment, sweepline_point)
+            return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right)
         elif (cmp > 0):
-            return self.contains_aux(node.right, segment, sweepline_point)
-        else:
-             return True
+            return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node)
+        else: #deu igual!
+            if (node.key == key): return (node_dad, node, last_turn_left, last_turn_right)
+            else:
+                if (node.key.init == key.init):
+                    cmp = self.compare_to(key.to, node.key)
+                elif (node.key.init == key.to):
+                    cmp = -self.compare_to(key.init, node.key)
+                elif (node.key.to == key.init):
+                    cmp = self.compare_to(key.to, node.key)
+                else:
+                    cmp = self.compare_to(key.init, node.key)
 
-    # cuidado com mais de um ponto acabando num extremo
+                print("cmp else igual " + str(cmp))
+                if (cmp < 0):
+                    return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right)
+                else: 
+                    return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node)
+
+
 
     def get_predecessor(self, key, sweepline_point): 
     #    se o noh tem subarvore esquerda :max(subarvore esquerda)
     #                       cc se sou filho direito, meu pai eh antecessor
     #                       cc nao tenho antecessor
-        node = self.root
-        last_turn_right = None
 
-        if (node == None):
-            print("A RAIZ E NULL!")
-
-        if (sweepline_point.x == 83.0 and sweepline_point.y == 25.0):
-            print('------------BUSCANDO PREDECESSOR-------------')
-        while (node != None):
-            cmp = self.compare_to(sweepline_point, node.key)
-            if (sweepline_point.x == 83.0 and sweepline_point.y == 25.0):
-                print('node.key: (' + str(node.key.init.x) + ', ' + str(node.key.init.y) + '), (' + str(node.key.to.x) +', ' + str(node.key.to.y)+ ')')
-                print('cmp(sweepline_point, node.key) = ' + str(cmp))
-            if(cmp > 0):
-                last_turn_right = node
-                node = node.right
-            elif(cmp < 0 or (cmp == 0 and key != node.key)):
-                node = node.left
-            else:
-                break
+        search_list = self.search_node(None, self.root, key, sweepline_point, None, None)
+        if(search_list == None):
+            print("DEU RUIM")
+            return False
+        node = search_list[1]
+        last_turn_right = search_list[3]
 
         if (node.left != None): 
             return self.max_aux(node.left)
@@ -155,22 +185,13 @@ class SegmentBST:
     #    se o noh tem subarvore direita :min(subarvore direita)
     #                       cc se sou filho esquerdo, meu pai eh sucessor
     #                       cc nao tenho sucessor
-        node = self.root
-        last_turn_left = None
+        search_list = self.search_node(None, self.root, key, sweepline_point, None, None)
+        if(search_list == None):
+            print("DEU RUIM")
+            return False
 
-        while (node != None):
-
-            cmp = self.compare_to(sweepline_point, node.key)
-            if(cmp > 0):
-                print(1)
-                node = node.right
-            elif(cmp < 0 or (cmp == 0 and key != node.key)):
-                print(0)
-                print("last_turn_left: (" + str(node.key.init.x) + ', ' + str(node.key.init.y) + ')')
-                last_turn_left = node
-                node = node.left
-            else:
-                break
+        node = search_list[1]
+        last_turn_left = search_list[2]
 
         if (node.right != None):
             print("min_aux")
@@ -181,22 +202,35 @@ class SegmentBST:
             return last_turn_left
         return False
 
-
     def remove(self, segment, sweepline_point):
-        if (self.contains(segment, sweepline_point)):
+        if (self.search_node(None, self.root, segment, sweepline_point, None, None)):
             self.root = self.remove_aux(self.root, segment, sweepline_point)
         else:
             print("There is no point!")
             print(segment)
-
-    #Assuming there aren`t two equal segments  
+            print(self.search_node(None, self.root, segment, sweepline_point, None, None))
+ 
     def remove_aux(self, node, segment, sweepline_point):
         
         cmp = self.compare_to(sweepline_point, node.key)
         
-        if (cmp < 0): 
-            node.left = self.remove_aux(node.left, segment, sweepline_point)
+        if (cmp < 0): node.left = self.remove_aux(node.left, segment, sweepline_point)
         elif (cmp > 0): node.right = self.remove_aux(node.right, segment, sweepline_point)
+        elif(node.key != segment):
+            if (node.key.init == segment.init):
+                cmp = self.compare_to(segment.to, node.key)
+            elif (node.key.init == segment.to):
+                cmp = -self.compare_to(segment.init, node.key)
+            elif (node.key.to == segment.init):
+                cmp = self.compare_to(segment.to, node.key)
+            else:
+                cmp = self.compare_to(segment.init, node.key)
+
+            if (cmp < 0):
+                node.left = self.remove_aux(node.left, segment, sweepline_point)
+            else: 
+                node.right = self.remove_aux(node.right, segment, sweepline_point)
+
         else:
             print("achei o segmento!")
             print(node.key)
