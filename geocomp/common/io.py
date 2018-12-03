@@ -5,7 +5,26 @@ from geocomp.common.point   import Point
 from geocomp.common.polygon import Polygon
 from geocomp.common.segment import Segment
 
+""" 
 
+* Função que le pontos, vértices e segmentos de um arquivo, ignorando
+  linhas que começam por #
+
+Essa funão lê os seguintes objetos
+
+ * Ponto: duas coordenadas separadas por espaço em uma linha
+
+ * Segmento: 4 coordenadas separadas por espaço em uma linha
+
+ * uma série de linhas, delimitadas por uma linha com '[' no começo e
+   uma com ']' no final, e os pontos do polígono em ordem
+   anti-horário, sendo cada linha as duas coordenadas separadas por
+   espaços.
+
+Note que espera-se que os objetos retornados tenham a função 'plot'
+
+
+"""
 def read(filename):
     with open(filename) as file:
         i = 0
