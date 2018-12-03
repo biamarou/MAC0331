@@ -13,9 +13,8 @@ Sub-modulos:
 from . import convexhull
 from . import farthest
 from .common.guicontrol import init_display
-from .common.guicontrol import config_canvas
+from .common.guicontrol import plot_input
 from .common.guicontrol import run_algorithm
-from .common.io import open_file
 from .common.prim import get_count
 from .common.prim import reset_count
 
