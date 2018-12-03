@@ -162,17 +162,22 @@ class SegmentBST:
 
             cmp = self.compare_to(sweepline_point, node.key)
             if(cmp > 0):
+                print(1)
                 node = node.right
             elif(cmp < 0 or (cmp == 0 and key != node.key)):
+                print(0)
+                print("last_turn_left: (" + str(node.key.init.x) + ', ' + str(node.key.init.y) + ')')
                 last_turn_left = node
                 node = node.left
             else:
                 break
 
         if (node.right != None):
+            print("min_aux")
             return self.min_aux(node.right)
     
         elif (last_turn_left != None):
+            print("last_turn_left")
             return last_turn_left
         return False
 

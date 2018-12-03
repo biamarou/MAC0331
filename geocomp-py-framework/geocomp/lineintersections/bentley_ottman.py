@@ -124,6 +124,7 @@ def Bentley_ottman (l):
             print('p.segment[1]: (' + str(p.segment[1].init.x) + ', ' + str(p.segment[1].init.y) + ')')
             
             pred = segment_tree.get_predecessor(p.segment[0], p.key)
+            print("Pegando o succ:")
             succ = segment_tree.get_sucessor(p.segment[1], p.key)
 
             segment_tree.remove(p.segment[0], p.key)
@@ -152,7 +153,7 @@ def Bentley_ottman (l):
                 event_queue.insert(point.Point(x, y), [pred.key, p.segment[1].key])
             
 
-            if(succ and prim.intersect(succ.init, succ.to, p.segment[0].init, p.segment[0].to)):
+            if(succ and prim.intersect(succ.key.init, succ.key.to, p.segment[0].init, p.segment[0].to)):
                 succ.key.hilight(color_line = 'yellow')
                 p.segment[0].hilight(color_line = 'yellow')
                 control.sleep(sleep_time)
@@ -163,8 +164,8 @@ def Bentley_ottman (l):
                 event_queue.insert(point.Point(x, y), [p.segment[0].key, succ.key])
 
             p.key.hilight('red')
-            pred.key.plot()
-            succ.key.plot()
+            if (pred): pred.key.plot()
+            if (pred): succ.key.plot()
 
 
 def filter_segments_and_points (l):
