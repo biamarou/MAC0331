@@ -115,4 +115,12 @@ class Polygon:
             return True
         if type(self) != type(other):
             return False
-        return self.vertices() == other.vertices()
+        edges1 = self.edges()
+        edges2 = other.edges()
+        for e in edges1:
+            if e not in edges2:
+                return False
+        for e in edges2:
+            if e not in edges1:
+                return False
+        return True

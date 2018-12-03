@@ -5,27 +5,60 @@ from geocomp.common.point   import Point
 from geocomp.common.polygon import Polygon
 from geocomp.common.segment import Segment
 
-""" 
 
-* Função que le pontos, vértices e segmentos de um arquivo, ignorando
-  linhas que começam por #
-
-Essa funão lê os seguintes objetos
-
- * Ponto: duas coordenadas separadas por espaço em uma linha
-
- * Segmento: 4 coordenadas separadas por espaço em uma linha
-
- * uma série de linhas, delimitadas por uma linha com '[' no começo e
-   uma com ']' no final, e os pontos do polígono em ordem
-   anti-horário, sendo cada linha as duas coordenadas separadas por
-   espaços.
-
-Note que espera-se que os objetos retornados tenham a função 'plot'
-
-
-"""
 def read(filename):
+    """Reads any type of geometric primitive data structures (Point,
+    Polygon, Segment) from a file and returns it as a list.
+
+    This method reads geometric data from a file. Any empty line or
+    any line started by '#' (considered  a commentary) is ignored.
+    The input can be mixed, it can contains a set of Polygons, Points
+    and Segments and not necessarily only one type of data.
+
+    The following patterns are required during the input operation:
+
+    Point: defined by two floating point coordinates, on a line,
+           separated by whitespaces. For example:
+
+               0 0
+               0.5 1.5
+               1.5 3
+
+    Polygon: defined by a list of adjacent points, enclosed by '['
+             at the beginning and ']' at the end, in the order that
+             they appear in the polygon boundary, i.e., any pair of
+             consecutive points defines an edge on the polygon
+             boundary. For example, the following input defines a
+             square:
+
+             [
+             0 0
+             1 0
+             1 1
+             0 1
+             ]
+
+    Segment: defined by four floating point coordinates, on a line,
+             separated by whitespaces. Each pair of consecutive
+             coordinates defines a segment endpoint. For example,
+             the following input defines a segment from (0, 0) to
+             (0.5, 1.5):
+
+             0 0 0.5 1.5
+
+    :param filename: (str) The name of the file that will be read
+
+    :return: (list) A list of geometric primitive data structures
+             read from the file
+
+    Raises:
+        FileNotFoundError: if file could not be found
+
+        TypeError: if 'filename' is None
+
+        ValueError: if some input from the file does not follow the
+                    required patterns
+    """
     with open(filename) as file:
         i = 0
         vertices = []
