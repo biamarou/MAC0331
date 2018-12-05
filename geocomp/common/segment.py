@@ -8,44 +8,44 @@ class Segment:
     "Um segmento de reta"
     def __init__ (self, pto_from=None, pto_to=None):
         "Para criar, passe os dois pontos extremos"
-        self.x = pto_from
-        self.y = pto_to
-        if self.__cmp(self.x, self.y) < 0:
-            self.upper = self.x
-            self.lower = self.y
+        self.init  = pto_from
+        self.to = pto_to
+        if self.__cmp(self.init, self.to) < 0:
+            self.upper = self.init
+            self.lower = self.to
         else:
-            self.upper = self.y
-            self.lower = self.x
+            self.upper = self.to
+            self.lower = self.init
 
     def __repr__ (self):
         "retorna uma string da forma [ ( x0 y0 );( x1 y1 ) ]"
-        return '[ ' + repr(self.x) + '; ' + repr(self.y) + ' ]'
+        return '[ ' + repr(self.init) + '; ' + repr(self.to) + ' ]'
 
     def __eq__(self, other):
         if self is other:
             return True
         if type(self) != type(other):
             return False
-        if self.x == other.x and self.y == other.y:
+        if self.init == other.init and self.to == other.to:
             return True
-        if self.x == other.y and self.y == other.x:
+        if self.init == other.to and self.to == other.init:
             return True
         return False
 
     def endpoints(self):
-        return self.x, self.y
+        return self.init, self.to
 
     def hilight (self, color_line=config.COLOR_HI_SEGMENT,
             color_point=config.COLOR_HI_SEGMENT_POINT):
         "desenha o segmento de reta com destaque na tela"
-        self.lid = self.x.lineto (self.y, color_line)
-        self.pid0 = self.x.hilight (color_point)
-        self.pid1 = self.y.hilight (color_point)
+        self.lid = self.init.lineto (self.to, color_line)
+        self.pid0 = self.init.hilight (color_point)
+        self.pid1 = self.to.hilight (color_point)
         return self.lid
 
     def plot (self, cor=config.COLOR_SEGMENT):
         "desenha o segmento de reta na tela"
-        self.lid = self.x.lineto (self.y, cor)
+        self.lid = self.init.lineto (self.to, cor)
         return self.lid
 
     def hide (self, id=None):
@@ -54,12 +54,12 @@ class Segment:
         control.plot_delete (id)
 
     def adj(self, p):
-        if p == self.x:
-            return self.y
-        return self.x
+        if p == self.init:
+            return self.to
+        return self.init
 
     def __hash__(self):
-        return hash(self.x) ^ hash(self.y)
+        return hash(self.init) ^ hash(self.to)
 
     def __cmp(self, a, b):
         if a[1] > b[1]:
@@ -78,7 +78,7 @@ class Segment:
     # manter compatibilidade com o projeto de Visibility Graph do
     # Lucas Moretto.
     def __contains__(self, p):
-        return p == self.x or p == self.y
+        return p == self.init or p == self.to
 
     
     # A baixo seguem setters e getters para atributos para manter
@@ -87,16 +87,16 @@ class Segment:
        
     @property
     def p1(self):
-        return self.x
+        return self.init
 
     @p1.setter
     def p1(self, p1):
-        self.x = p1
+        self.init = p1
 
     @property
     def p2(self):
-        return self.y
+        return self.to
 
     @p1.setter
     def p2(self, p2):
-        self.x = p2
+        self.init = p2
