@@ -171,7 +171,6 @@ def on_segment(a, b, c):
         b.y <= c.y <= a.y
 
 
-    return r0 == (r1 + r2 + r3) and r3 != 0
 
 def dot(u, v):
     return u.x * v.x + u.y * v.y
