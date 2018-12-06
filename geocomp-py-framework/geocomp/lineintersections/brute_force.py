@@ -12,15 +12,15 @@ def Brute_force (l):
 
     for i in range(0, len(s) - 1):
         s[i].hilight(color_line = "blue")
-        control.sleep(0.5)
+        control.sleep()
         for j in range(i + 1, len(s)):
             s[j].hilight()
-            control.sleep(0.5)
+            control.sleep()
             if (prim.intersect(s[i].init, s[i].to, s[j].init, s[j].to)):
                 # guarda os indices dos segmentos que se intersectam
                 s[i].hilight(color_line = "yellow")
                 s[j].hilight(color_line = "yellow")
-                control.sleep(0.5)                
+                control.sleep()                
                 intersections.append((i, j))
                 s[i].hilight(color_line = "blue")
             s[j].plot()

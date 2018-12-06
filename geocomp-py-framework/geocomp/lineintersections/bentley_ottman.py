@@ -6,7 +6,6 @@ from geocomp import config
 from geocomp.lineintersections import PointBST as PBST
 from geocomp.lineintersections import SegmentBST as SBST 
 
-sleep_time = 2.0
 
 def Bentley_ottman (l):
     segments_list, points_list = filter_segments_and_points(l) #s is the segments list and p is the points list
@@ -19,13 +18,18 @@ def Bentley_ottman (l):
     for p in points_list:
         event_queue.insert(p[0], [segments_list[p[1]]])
 
+    previous = None
+
     segment_tree = SBST.SegmentBST()
     while(not event_queue.isEmpty()):
         p = event_queue.removeMinKey()
+        
+        if (previous != None and p.key.x < previous.x):
+            continue
 
         if (p.segment[0].init == p.key): #p eh ponta esquerda
             p.key.hilight(color = 'blue')
-            control.sleep(sleep_time)
+            control.sleep()
             segment_tree.insert(p.segment[0], p.key)
 
             pred = segment_tree.get_predecessor(p.segment[0], p.key)
@@ -37,12 +41,12 @@ def Bentley_ottman (l):
             
             if (pred): pred.key.hilight(color_line = 'magenta')
             if (succ): succ.key.hilight(color_line = 'magenta')
-            control.sleep(sleep_time)
+            control.sleep()
 
             if (pred and prim.intersect(pred.key.init, pred.key.to, p.segment[0].init, p.segment[0].to)):
                 pred.key.hilight(color_line = 'yellow')
                 p.segment[0].hilight(color_line = 'yellow')
-                control.sleep(sleep_time)
+                control.sleep()
                 p.segment[0].plot()
                 pred.key.plot()      
                 intersections.append((pred.key, p.segment[0]))
@@ -52,7 +56,7 @@ def Bentley_ottman (l):
             if (succ and prim.intersect(succ.key.init, succ.key.to, p.segment[0].init, p.segment[0].to)):
                 succ.key.hilight(color_line = 'yellow')
                 p.segment[0].hilight(color_line = 'yellow')
-                control.sleep(sleep_time)
+                control.sleep()
                 p.segment[0].plot()
                 succ.key.plot()
                 intersections.append((succ.key, p.segment[0]))
@@ -65,7 +69,7 @@ def Bentley_ottman (l):
 
         elif (p.segment[0].to == p.key): #p eh ponta direita
             p.segment[0].to.hilight(color = 'blue')
-            control.sleep(sleep_time)
+            control.sleep()
             print("arvore")
             segment_tree.imprime()
             pred = segment_tree.get_predecessor(p.segment[0], p.key)
@@ -94,7 +98,7 @@ def Bentley_ottman (l):
 
             if (pred): pred.key.hilight(color_line = 'magenta')
             if (succ): succ.key.hilight(color_line = 'magenta')
-            control.sleep(sleep_time)
+            control.sleep()
 
             if(not pred or not succ): 
                 p.key.hilight('red')
@@ -105,7 +109,7 @@ def Bentley_ottman (l):
             if (prim.intersect(pred.key.init, pred.key.to, succ.key.init, succ.key.to)):
                 succ.key.hilight(color_line = 'yellow')
                 pred.key.hilight(color_line = 'yellow')
-                control.sleep(sleep_time)
+                control.sleep()
                 pred.key.plot()
                 succ.key.plot()
                 intersections.append((pred.key, succ.key))
@@ -119,38 +123,36 @@ def Bentley_ottman (l):
         else: # ponto de intersecao
             p.key.plot()
             p.key.hilight('blue')
-            control.sleep(sleep_time)
+            control.sleep()
             print("arvore antes do pred succ inversao")
             segment_tree.imprime()
             print('p.segment[0]: (' + str(p.segment[0].init.x) + ', ' + str(p.segment[0].init.y) + ')')
             print('p.segment[1]: (' + str(p.segment[1].init.x) + ', ' + str(p.segment[1].init.y) + ')')
             
-            pred = segment_tree.get_predecessor(p.segment[0], p.key)
-            print("Pegando o succ:")
-            succ = segment_tree.get_sucessor(p.segment[1], p.key)
-
             segment_tree.remove(p.segment[0], p.key)
             segment_tree.remove(p.segment[1], p.key)
             print("arvore depois de remover na inversao")
             segment_tree.imprime()
-            
-            dummy = point.Point(p.key.x + 0.0001, p.key.y)
 
-            segment_tree.insert(p.segment[0], dummy)
-            segment_tree.insert(p.segment[1], dummy)
+            segment_tree.insert(p.segment[0], p.key)
+            segment_tree.insert(p.segment[1], p.key)
             print("arvore depois da insercao na inversao")
             segment_tree.imprime()
+
+            pred = segment_tree.get_predecessor(p.segment[1], p.key)
+            print("Pegando o succ:")
+            succ = segment_tree.get_sucessor(p.segment[0], p.key)
 
             if (pred):
                 p.segment[1].hilight(color_line = 'green') 
                 pred.key.hilight(color_line = 'magenta')
-                control.sleep(sleep_time)
+                control.sleep()
 
 
             if(pred and prim.intersect(pred.key.init, pred.key.to, p.segment[1].init, p.segment[1].to)):
                 pred.key.hilight(color_line = 'yellow')
                 p.segment[1].hilight(color_line = 'yellow')
-                control.sleep(sleep_time)
+                control.sleep()
                 pred.key.plot()
                 p.segment[1].plot()
                 intersections.append((pred.key, p.segment[1]))
@@ -164,12 +166,12 @@ def Bentley_ottman (l):
             if (succ): 
                 succ.key.hilight(color_line = 'magenta')
                 p.segment[0].hilight('green') 
-                control.sleep(sleep_time)
+                control.sleep()
 
             if(succ and prim.intersect(succ.key.init, succ.key.to, p.segment[0].init, p.segment[0].to)):
                 succ.key.hilight(color_line = 'yellow')
                 p.segment[0].hilight(color_line = 'yellow')
-                control.sleep(sleep_time)
+                control.sleep()
                 p.segment[0].plot()
                 succ.key.plot()
                 intersections.append((succ.key, p.segment[0]))
@@ -181,7 +183,12 @@ def Bentley_ottman (l):
                 p.segment[0].plot()
 
             p.key.hilight('red')
+        
+        previous = p.key
 
+def move_point (x, y, v, w):
+    delta = 0.01
+    return point.Point((v.x + w.x)*delta - x * (2* delta - 1), (v.y + w.y)*delta - y * (2* delta - 1))
 
 def filter_segments_and_points (l):
     segments = []

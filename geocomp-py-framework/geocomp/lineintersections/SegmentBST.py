@@ -62,14 +62,12 @@ class SegmentBST:
             node.right = self.insert_aux(node.right, segment, sweepline_point)
 
         else: #deu igual!
-            if (node.key.init == segment.init):
-                cmp = self.compare_to(key.to, node.key)
-            elif (node.key.init == segment.to):
-                cmp = -self.compare_to(segment.init, node.key)
-            elif (node.key.to == segment.init):
-                cmp = self.compare_to(segment.to, node.key)
-            else:
+            if (node.key.init == segment.to):
+                    cmp = -self.compare_to(segment.init, node.key)
+            elif(node.key.to == segment.to):
                 cmp = self.compare_to(segment.init, node.key)
+            else: #sweepline point eh intersecao propria, init = init, to = init
+                cmp = self.compare_to(segment.to, node.key)
 
             if (cmp < 0):
                 node.left = self.insert_aux(node.left, segment, sweepline_point)
@@ -132,33 +130,35 @@ class SegmentBST:
       #  else:
       #       return True
 
-    def search_node(self, node_dad, node, key, sweepline_point, last_turn_left, last_turn_right):
+    def search_node(self, node_dad, node, key, sweepline_point, last_turn_left, last_turn_right, remove = False):
         
         if(node == None): return None
         
         cmp = self.compare_to(sweepline_point, node.key)
-        print ("cmp begin " + str(cmp))
+        print('cmp ' + str(cmp))
         if (cmp < 0):
-            return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right)
+            return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right, remove)
         elif (cmp > 0):
-            return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node)
+            return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node, remove)
         else: #deu igual!
             if (node.key == key): return (node_dad, node, last_turn_left, last_turn_right)
             else:
-                if (node.key.init == key.init):
-                    cmp = self.compare_to(key.to, node.key)
-                elif (node.key.init == key.to):
+                if (node.key.init == key.to):
                     cmp = -self.compare_to(key.init, node.key)
-                elif (node.key.to == key.init):
-                    cmp = self.compare_to(key.to, node.key)
-                else:
+                elif(node.key.to == key.to):
                     cmp = self.compare_to(key.init, node.key)
+                else: #sweepline point eh intersecao propria, init = init, to = init
+                    cmp = self.compare_to(key.to, node.key)
+                    if(remove):
+                        cmp = -cmp
+                # se vou remover preciso olhar a arvore com a referencia anterior
+                
+                print('cmp deu igual-else ' + str(cmp))
 
-                print("cmp else igual " + str(cmp))
                 if (cmp < 0):
-                    return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right)
+                    return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right, remove)
                 else: 
-                    return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node)
+                    return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node, remove)
 
 
 
@@ -166,6 +166,7 @@ class SegmentBST:
     #    se o noh tem subarvore esquerda :max(subarvore esquerda)
     #                       cc se sou filho direito, meu pai eh antecessor
     #                       cc nao tenho antecessor
+        print('node search pred')
 
         search_list = self.search_node(None, self.root, key, sweepline_point, None, None)
         if(search_list == None):
@@ -185,6 +186,8 @@ class SegmentBST:
     #    se o noh tem subarvore direita :min(subarvore direita)
     #                       cc se sou filho esquerdo, meu pai eh sucessor
     #                       cc nao tenho sucessor
+        print('node search succ')
+        
         search_list = self.search_node(None, self.root, key, sweepline_point, None, None)
         if(search_list == None):
             print("DEU RUIM")
@@ -203,12 +206,12 @@ class SegmentBST:
         return False
 
     def remove(self, segment, sweepline_point):
-        if (self.search_node(None, self.root, segment, sweepline_point, None, None)):
+        if (self.search_node(None, self.root, segment, sweepline_point, None, None, True)):
             self.root = self.remove_aux(self.root, segment, sweepline_point)
         else:
             print("There is no point!")
             print(segment)
-            print(self.search_node(None, self.root, segment, sweepline_point, None, None))
+            print(self.search_node(None, self.root, segment, sweepline_point, None, None, True))
  
     def remove_aux(self, node, segment, sweepline_point):
         
@@ -217,20 +220,20 @@ class SegmentBST:
         if (cmp < 0): node.left = self.remove_aux(node.left, segment, sweepline_point)
         elif (cmp > 0): node.right = self.remove_aux(node.right, segment, sweepline_point)
         elif(node.key != segment):
-            if (node.key.init == segment.init):
-                cmp = self.compare_to(segment.to, node.key)
-            elif (node.key.init == segment.to):
+            if (node.key.init == segment.to):
                 cmp = -self.compare_to(segment.init, node.key)
-            elif (node.key.to == segment.init):
-                cmp = self.compare_to(segment.to, node.key)
-            else:
+            elif(node.key.to == segment.to):
                 cmp = self.compare_to(segment.init, node.key)
+            else: #sweepline point eh intersecao propria, init = init, to = init
+                cmp = self.compare_to(segment.to, node.key)
+                cmp = -cmp
 
             if (cmp < 0):
                 node.left = self.remove_aux(node.left, segment, sweepline_point)
-            else: 
+            elif(cmp > 0): 
                 node.right = self.remove_aux(node.right, segment, sweepline_point)
-
+            else:
+                print ("CMP DEU IGUAL REMOVE")
         else:
             print("achei o segmento!")
             print(node.key)

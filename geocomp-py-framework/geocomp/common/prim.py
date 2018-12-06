@@ -14,6 +14,8 @@ num_area2 = 0
 num_dist = 0
 # epsilon do erro
 ERR = 1.0e-5
+# Numero de vezes que a funcao intersecta foi chamada
+num_intersect = 0
 
 def cmpFloat(a, b):
 	if (abs(a-b) < ERR):
@@ -67,6 +69,10 @@ def get_count ():
 	"Retorna o numero total de operacoes primitivas realizadas"
 	return num_area2 + num_dist
 
+def get_count_intersections ():
+	"Retorna o numero total de chamadas do intersecta"
+	return num_intersect
+
 def reset_count ():
 	"Zera os contadores de operacoes primitivas"
 	global num_area2, num_dist
@@ -88,5 +94,8 @@ def between (a, b, c):
 		return a.y <= c.y <= b.y or b.y <= c.y <= a.y
 
 def intersect (a, b, c, d):
+	global num_intersect
+	num_intersect = num_intersect + 1
+
 	if (proper_intersection(a, b, c, d)): return True
 	return between(a, b, c) or between(a, b, d) or between(c, d, a) or between(c, d, b)
