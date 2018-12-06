@@ -38,8 +38,8 @@ class SegmentBST:
         return ((r.y - l.y)/(r.x - l.x)) * (x - (l.x)) + l.y
 
     def compare_to (self, p, s): #devolve 1 se p estah ah esquerda de s.
-        left_test = prim.left(s.init, s.to, p)
-        left_on_test = prim.left_on(s.init, s.to, p)
+        left_test = prim.float_left(s.init, s.to, p)
+        left_on_test = prim.float_left_on(s.init, s.to, p)
 
         if (left_on_test): return 0
         elif (left_test): return 1

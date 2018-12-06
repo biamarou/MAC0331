@@ -18,6 +18,7 @@ ERR = 1.0e-5
 num_intersect = 0
 
 def cmpFloat(a, b):
+	"Comparacao de float com margem de erro com preferencia para a igualdade"
 	if (abs(a-b) < ERR):
 		return 0
 	elif (a + ERR > b):
@@ -32,15 +33,27 @@ def area2 (a, b, c):
 	# Descobrir como aproximar pra zero no ponto de intersec
 	return area
 
+def float_left (a, b, c):
+	"Verdadeiro se c est  esquerda do segmento orientado ab utilizando comparacao de float"
+	if(cmpFloat(area2 (a, b, c), 0) == 1):
+		return True
+	return False
+
+def float_left_on (a, b, c):
+	"Verdadeiro se c est  esquerda ou sobre o segmento orientado ab utilizando comparacao de float"
+	if(cmpFloat(area2 (a, b, c), 0) == 0):
+		return True
+	return False
+
 def left (a, b, c):
 	"Verdadeiro se c est  esquerda do segmento orientado ab"
-	if(cmpFloat(area2 (a, b, c), 0) == 1):
+	if(area2 (a, b, c) == 1):
 		return True
 	return False
 
 def left_on (a, b, c):
 	"Verdadeiro se c est  esquerda ou sobre o segmento orientado ab"
-	if(cmpFloat(area2 (a, b, c), 0) == 0):
+	if(area2 (a, b, c) == 0):
 		return True
 	return False
 
