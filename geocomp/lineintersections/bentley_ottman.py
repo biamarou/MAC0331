@@ -12,8 +12,8 @@ def which_point (point, segment):
     if (point == segment.init):
         return 0
     elif (point == segment.to):
-        return 1
-    return 2
+        return 2
+    return 1
 
 def cmp_sort_event_point (a, b):
     if (a[0] < b[0]): return -1
@@ -95,7 +95,7 @@ def Bentley_ottman (segments_list):
                 if (succ): succ.key.plot()
                 segment[1].init.hilight('red')
 
-            elif (segment[0] == 1): #p eh ponta direita
+            elif (segment[0] == 2): #p eh ponta direita
                 segment[1].to.hilight(color = 'blue')
                 control.sleep()
                 print("arvore")
@@ -124,15 +124,13 @@ def Bentley_ottman (segments_list):
                 print("removi")
                 segment_tree.imprime()
 
-                if (pred): pred.key.hilight(color_line = 'magenta')
-                if (succ): succ.key.hilight(color_line = 'magenta')
-                control.sleep()
-
-                if(not pred or not succ): 
+                if(not pred or not succ):
                     p.key.hilight('red')
-                    if (pred): pred.key.plot()
-                    if (succ): succ.key.plot()
                     continue
+                
+                pred.key.hilight(color_line = 'magenta')
+                succ.key.hilight(color_line = 'magenta')
+                control.sleep()
             
                 if (prim.intersect(pred.key.init, pred.key.to, succ.key.init, succ.key.to)):
                     succ.key.hilight(color_line = 'yellow')
@@ -219,9 +217,10 @@ def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
         node_point = event_queue.contains(new_event)
 
         if (node_point):
-            node_point.segment.append([2, [segment1, segment2]])
+            node_point.segment.append([1, [segment1, segment2]])
+            node_point.segment.sort(key=tools.cmp_to_key(cmp_sort_event_point))
         else:
-            event_queue.insert(new_event, [[2, [segment1, segment2]]])
+            event_queue.insert(new_event, [[1, [segment1, segment2]]])
 
 
 def filter_points (segments):
@@ -246,6 +245,25 @@ def cmp_sort_point (a, b):
     elif (a[0].y < b[0].y): return -1
     else: return 0
 
+def get_intersection_2(r, s):
+    
+    if (r.init == s.init or r.init == s.to):
+        return (r.init.x, r.init.y)
+    elif (r.to == s.to or r.to == s.init):
+        return (r.to.x, r.to.y)
+    
+    # r = (a.x, a.y) (b.x, b.y)
+    # s = (c.x, c.y) (d.x, d.y)
+    ab = [r.to.x - r.init.x, r.to.y - r.init.y]
+    ca = [r.init.x - s.init.x, r.init.y - s.init.y]
+    cd = [s.to.x - s.init.x, s.to.y - s.init.y]
+    ac = [s.init.x - r.init.x, s.init.y - r.init.y]
+
+    y = prim.cross(ca, ab)[0]/prim.cross(cd, ab)[0]
+    x = prim.cross(ac, cd)[0]/prim.cross(ab, cd)[0]
+
+    return (x, y)
+
 def get_intersection(r, s):
     # quando a reta estah na forma 'y = ax + b' o coef a eh delta
 
@@ -264,5 +282,3 @@ def get_intersection(r, s):
     y = delta_r * (x - r.init.x) + r.init.y
 
     return (x, y)
-
-
