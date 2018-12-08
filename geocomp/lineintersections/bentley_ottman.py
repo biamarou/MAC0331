@@ -271,6 +271,19 @@ def get_intersection(r, s):
         return (r.init.x, r.init.y)
     elif (r.to == s.to or r.to == s.init):
         return (r.to.x, r.to.y)
+    elif (r.init.x == r.to.x):
+        y_intercept = ((s.to.y-s.init.y)/(s.to.x-s.init.x))*(r.init.x - s.init.x) + s.init.y 
+        #y = ((y1-y0)/(x1-x0))*(x-x0) + y0
+        if (r.init.y <= y_intercept <= r.to.y):
+            return (r.to.x, y_intercept)
+        else:
+            print("EITA CARAI")
+    elif (s.init.x == s.to.x):
+        y_intercept = ((r.to.y-r.init.y)/(r.to.x-r.init.x))*(s.init.x - r.init.x) + r.init.y 
+        if (s.init.y <= y_intercept <= s.to.y):
+            return (s.to.x, y_intercept)
+        else:
+            print("EITA CARAI")
 
     delta_r = (r.init.y - r.to.y)/(r.init.x - r.to.x)
     delta_s = (s.init.y - s.to.y)/(s.init.x - s.to.x)
