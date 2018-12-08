@@ -55,12 +55,12 @@ def Bentley_ottman (segments_list):
         
         if (previous != None and p.key.x < previous.x):
             continue
-        
+        print(p.segment)
         for segment in p.segment:
 
             # a lista de segmentos de cada ponto eh formada por um par [w , s]
             # onde w eh um numero que indica ponta esquerda ou direita e s eh o segmento
-            
+            print(segment)
             if (segment[0] == 0): #p eh ponta esquerda
                 p.key.hilight(color = 'blue')
                 control.sleep()
@@ -85,7 +85,7 @@ def Bentley_ottman (segments_list):
                     pred.key.plot()      
                     intersections.append((pred.key, segment[1]))
                     x,y = get_intersection(pred.key, segment[1])
-                    event_queue.insert(point.Point(x, y), [pred.key, segment[1]])
+                    event_queue.insert(point.Point(x, y), [[2, [pred.key, segment[1]]]])
                
                 if (succ and prim.intersect(succ.key.init, succ.key.to, segment[1].init, segment[1].to)):
                     succ.key.hilight(color_line = 'yellow')
@@ -95,7 +95,7 @@ def Bentley_ottman (segments_list):
                     succ.key.plot()
                     intersections.append((succ.key, segment[1]))
                     x,y = get_intersection(succ.key, segment[1])
-                    event_queue.insert(point.Point(x, y), [segment[1], succ.key])
+                    event_queue.insert(point.Point(x, y), [[2, [segment[1], succ.key]]])
 
                 if (pred): pred.key.plot()
                 if (succ): succ.key.plot()
@@ -148,7 +148,7 @@ def Bentley_ottman (segments_list):
                     succ.key.plot()
                     intersections.append((pred.key, succ.key))
                     x,y = get_intersection(pred.key, succ.key)
-                    event_queue.insert(point.Point(x, y), [pred.key, succ.key])
+                    event_queue.insert(point.Point(x, y), [[2, [pred.key, succ.key]]])
             
                 pred.key.plot()
                 succ.key.plot()
@@ -161,61 +161,61 @@ def Bentley_ottman (segments_list):
                 control.sleep()
                 print("arvore antes do pred succ inversao")
                 segment_tree.imprime()
-                print('p.segment[0]: (' + str(p.segment[0].init.x) + ', ' + str(p.segment[0].init.y) + ')')
-                print('p.segment[1]: (' + str(p.segment[1].init.x) + ', ' + str(p.segment[1].init.y) + ')')
+                print('segment[0]: (' + str(segment[1][0].init.x) + ', ' + str(segment[1][0].init.y) + ')')
+                print('segment[1]: (' + str(segment[1][1].init.x) + ', ' + str(segment[1][1].init.y) + ')')
             
-                segment_tree.remove(p.segment[0], p.key)
-                segment_tree.remove(p.segment[1], p.key)
+                segment_tree.remove(segment[1][0], p.key)
+                segment_tree.remove(segment[1][1], p.key)
                 print("arvore depois de remover na inversao")
                 segment_tree.imprime()
 
-                segment_tree.insert(p.segment[0], p.key)
-                segment_tree.insert(p.segment[1], p.key)
+                segment_tree.insert(segment[1][1], p.key)
+                segment_tree.insert(segment[1][0], p.key)
                 print("arvore depois da insercao na inversao")
                 segment_tree.imprime()
 
-                pred = segment_tree.get_predecessor(p.segment[1], p.key)
+                pred = segment_tree.get_predecessor(segment[1][1], p.key)
                 print("Pegando o succ:")
-                succ = segment_tree.get_sucessor(p.segment[0], p.key)
+                succ = segment_tree.get_sucessor(segment[1][0], p.key)
 
                 if (pred):
-                    p.segment[1].hilight(color_line = 'green') 
+                    segment[1][1].hilight(color_line = 'green') 
                     pred.key.hilight(color_line = 'magenta')
                     control.sleep()
 
 
-                if(pred and prim.intersect(pred.key.init, pred.key.to, p.segment[1].init, p.segment[1].to)):
+                if(pred and prim.intersect(pred.key.init, pred.key.to, segment[1][1].init, segment[1][1].to)):
                     pred.key.hilight(color_line = 'yellow')
-                    p.segment[1].hilight(color_line = 'yellow')
+                    segment[1][1].hilight(color_line = 'yellow')
                     control.sleep()
                     pred.key.plot()
-                    p.segment[1].plot()
-                    intersections.append((pred.key, p.segment[1]))
-                    x,y = get_intersection(pred.key, p.segment[1])
-                    event_queue.insert(point.Point(x, y), [pred.key, p.segment[1]])
+                    segment[1][1].plot()
+                    intersections.append((pred.key, segment[1][1]))
+                    x,y = get_intersection(pred.key, segment[1][1])
+                    event_queue.insert(point.Point(x, y), [[2, [pred.key, segment[1][1]]]])
 
                 if (pred): 
                     pred.key.plot()
-                    p.segment[1].plot()
+                    segment[1][1].plot()
             
                 if (succ): 
                     succ.key.hilight(color_line = 'magenta')
-                    p.segment[0].hilight('green') 
+                    segment[1][0].hilight('green') 
                     control.sleep()
 
-                if(succ and prim.intersect(succ.key.init, succ.key.to, p.segment[0].init, p.segment[0].to)):
+                if(succ and prim.intersect(succ.key.init, succ.key.to, segment[1][0].init, segment[1][0].to)):
                     succ.key.hilight(color_line = 'yellow')
-                    p.segment[0].hilight(color_line = 'yellow')
+                    segment[1][0].hilight(color_line = 'yellow')
                     control.sleep()
-                    p.segment[0].plot()
+                    segment[1][0].plot()
                     succ.key.plot()
-                    intersections.append((succ.key, p.segment[0]))
-                    x,y = get_intersection(succ.key, p.segment[0])
-                    event_queue.insert(point.Point(x, y), [p.segment[0], succ.key])
+                    intersections.append((succ.key, segment[1][0]))
+                    x,y = get_intersection(succ.key, segment[1][0])
+                    event_queue.insert(point.Point(x, y), [[2, [segment[1][0], succ.key]]])
 
                 if (succ): 
                     succ.key.plot()
-                    p.segment[0].plot()
+                    segment[1][0].plot()
 
                 p.key.hilight('red')
         
