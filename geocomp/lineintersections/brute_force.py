@@ -4,31 +4,32 @@ from geocomp.common import control
 from geocomp import config
 
 def Brute_force (l):
-    s = filter_segments(l)
+    filter_segments(l)
     intersections = []
 
-    for i in range(len(s)):
-        s[i].plot()
+    for s in l:
+        s.plot()
 
-    for i in range(0, len(s) - 1):
-        s[i].hilight(color_line = "blue")
+    for i in range(0, len(l) - 1):
+        l[i].hilight(color_line = "blue")
         control.sleep()
-        for j in range(i + 1, len(s)):
-            s[j].hilight()
+        for j in range(i + 1, len(l)):
+            l[j].hilight()
             control.sleep()
-            if (prim.intersect(s[i].init, s[i].to, s[j].init, s[j].to)):
+            if (prim.intersect(l[i].init, l[i].to, l[j].init, l[j].to)):
                 # guarda os indices dos segmentos que se intersectam
-                s[i].hilight(color_line = "yellow")
-                s[j].hilight(color_line = "yellow")
+                l[i].hilight(color_line = "yellow")
+                l[j].hilight(color_line = "yellow")
                 control.sleep()                
                 intersections.append((i, j))
-                s[i].hilight(color_line = "blue")
-            s[j].plot()
-        s[i].plot()
+                l[i].hilight(color_line = "blue")
+            l[j].plot()
+        l[i].plot()
 
 def filter_segments (l):
-    segments = []
-
-    for i in range (0, len(l) - 1, 2):
-        segments.append(segment.Segment(l[i], l[i + 1]))
-    return segments
+    for i in range (len(l)):
+        if (l[i].init.x > l[i].to.x):
+            l[i].init, l[i].to = l[i].to, l[i].init
+        elif (l[i].init.x == l[i].to.x):
+            if (l[i].init.y > l[i].to.y):
+                l[i].init, l[i].to = l[i].to, l[i].init
