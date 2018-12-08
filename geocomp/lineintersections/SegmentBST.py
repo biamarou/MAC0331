@@ -114,22 +114,6 @@ class SegmentBST:
         node2.height = 1 + max(self.height_aux(node2.left), self.height_aux(node2.right))
         return node2
 
-    #def contains(self, segment, sweepline_point):
-    #    if (segment == None): return False
-    #    return self.contains_aux(self.root, segment, sweepline_point)
-
-    #def contains_aux(self, node, segment, sweepline_point):
-    #    if (node == None):
-    #        return False
-        
-   #     cmp = self.compare_to(sweepline_point, node.key)
-    #    if (cmp < 0):
-    #        return self.contains_aux(node.left, segment, sweepline_point)
-    #    elif (cmp > 0):
-       #     return self.contains_aux(node.right, segment, sweepline_point)
-      #  else:
-      #       return True
-
     def search_node(self, node_dad, node, key, sweepline_point, last_turn_left, last_turn_right, remove = False):
         
         if(node == None): return None
@@ -149,7 +133,7 @@ class SegmentBST:
                     cmp = self.compare_to(key.init, node.key)
                 else: #sweepline point eh intersecao propria, init = init, to = init
                     cmp = self.compare_to(key.to, node.key)
-                    if(remove):
+                    if(remove and node.key.init != key.init):
                         cmp = -cmp
                 # se vou remover preciso olhar a arvore com a referencia anterior
                 
@@ -226,7 +210,8 @@ class SegmentBST:
                 cmp = self.compare_to(segment.init, node.key)
             else: #sweepline point eh intersecao propria, init = init, to = init
                 cmp = self.compare_to(segment.to, node.key)
-                cmp = -cmp
+                if (node.key.init != segment.init):
+                    cmp = -cmp
 
             if (cmp < 0):
                 node.left = self.remove_aux(node.left, segment, sweepline_point)

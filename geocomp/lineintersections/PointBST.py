@@ -118,7 +118,7 @@ class PointBST:
 
     def contains_aux(self, node, point):
         if (node == None):
-            return False
+            return node
         cmp = self.compare_to(node.key, point)
         if (cmp > 0):
             return self.contains_aux(node.left, point)
@@ -130,8 +130,7 @@ class PointBST:
             elif (node.key.y < point.y):
                 return self.contains_aux(node.right, point)
             else:
-                return True
-
+                return node
 
     def remove(self, point):
         if (self.contains(point)):

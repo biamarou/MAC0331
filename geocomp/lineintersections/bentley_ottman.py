@@ -48,13 +48,10 @@ def Bentley_ottman (segments_list):
     event_queue = PBST.PointBST()  
     insert_point_segment(event_queue, points_list, segments_list)
     segment_tree = SBST.SegmentBST()
-    previous = None
     
     while(not event_queue.isEmpty()):
         p = event_queue.removeMinKey()
         
-        if (previous != None and p.key.x < previous.x):
-            continue
         print(p.segment)
         for segment in p.segment:
 
@@ -83,20 +80,17 @@ def Bentley_ottman (segments_list):
                     control.sleep()
                     segment[1].plot()
                     pred.key.plot()      
-                    intersections.append((pred.key, segment[1]))
-                    x,y = get_intersection(pred.key, segment[1])
-                    event_queue.insert(point.Point(x, y), [[2, [pred.key, segment[1]]]])
-               
+                    check_new_event (event_queue, pred.key, segment[1], p.key, intersections)
+                    
                 if (succ and prim.intersect(succ.key.init, succ.key.to, segment[1].init, segment[1].to)):
                     succ.key.hilight(color_line = 'yellow')
                     segment[1].hilight(color_line = 'yellow')
                     control.sleep()
                     segment[1].plot()
                     succ.key.plot()
-                    intersections.append((succ.key, segment[1]))
-                    x,y = get_intersection(succ.key, segment[1])
-                    event_queue.insert(point.Point(x, y), [[2, [segment[1], succ.key]]])
-
+                    check_new_event (event_queue, segment[1], succ.key, p.key, intersections)
+                    
+            
                 if (pred): pred.key.plot()
                 if (succ): succ.key.plot()
                 segment[1].init.hilight('red')
@@ -146,9 +140,7 @@ def Bentley_ottman (segments_list):
                     control.sleep()
                     pred.key.plot()
                     succ.key.plot()
-                    intersections.append((pred.key, succ.key))
-                    x,y = get_intersection(pred.key, succ.key)
-                    event_queue.insert(point.Point(x, y), [[2, [pred.key, succ.key]]])
+                    check_new_event (event_queue, pred.key, succ.key, p.key, intersections)
             
                 pred.key.plot()
                 succ.key.plot()
@@ -190,9 +182,7 @@ def Bentley_ottman (segments_list):
                     control.sleep()
                     pred.key.plot()
                     segment[1][1].plot()
-                    intersections.append((pred.key, segment[1][1]))
-                    x,y = get_intersection(pred.key, segment[1][1])
-                    event_queue.insert(point.Point(x, y), [[2, [pred.key, segment[1][1]]]])
+                    check_new_event (event_queue, pred.key, segment[1][1], p.key, intersections)
 
                 if (pred): 
                     pred.key.plot()
@@ -209,9 +199,7 @@ def Bentley_ottman (segments_list):
                     control.sleep()
                     segment[1][0].plot()
                     succ.key.plot()
-                    intersections.append((succ.key, segment[1][0]))
-                    x,y = get_intersection(succ.key, segment[1][0])
-                    event_queue.insert(point.Point(x, y), [[2, [segment[1][0], succ.key]]])
+                    check_new_event (event_queue, segment[1][0], succ.key, p.key, intersections)
 
                 if (succ): 
                     succ.key.plot()
@@ -219,7 +207,22 @@ def Bentley_ottman (segments_list):
 
                 p.key.hilight('red')
         
-            previous = p.key
+def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
+    
+    x,y = get_intersection(segment1, segment2)
+    new_event = point.Point(x, y)
+
+    if (sweepline.x > new_event.x or new_event == sweepline):
+        return
+    else:
+        intersections.append((segment1, segment2))
+        node_point = event_queue.contains(new_event)
+
+        if (node_point):
+            node_point.segment.append([2, [segment1, segment2]])
+        else:
+            event_queue.insert(new_event, [[2, [segment1, segment2]]])
+
 
 def filter_points (segments):
     points = []
