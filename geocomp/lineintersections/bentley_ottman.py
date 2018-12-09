@@ -48,10 +48,11 @@ def Bentley_ottman (segments_list):
     event_queue = PBST.PointBST()  
     insert_point_segment(event_queue, points_list, segments_list)
     segment_tree = SBST.SegmentBST()
-    
+    sweepline_id = None
     while(not event_queue.isEmpty()):
         p = event_queue.removeMinKey()
-        
+        control.plot_delete(sweepline_id)
+        sweepline_id = control.plot_vert_line(p.key.x, color='blue') 
         print(p.segment)
         for segment in p.segment:
 
