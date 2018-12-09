@@ -113,21 +113,21 @@ def Bentley_ottman (segments_list):
 
                 if (pred and prim.intersect(pred.key.init, pred.key.to, segment[1].init, segment[1].to)):
                     print("Encontrei interseção com o pred")
-                    pred.key.hilight(color_line = 'yellow')
-                    segment[1].hilight(color_line = 'yellow')
-                    control.sleep()
+                    if(check_new_event (event_queue, pred.key, segment[1], p.key, intersections)):
+                        pred.key.hilight(color_line = 'yellow')
+                        segment[1].hilight(color_line = 'yellow')
+                        control.sleep()
                     segment[1].plot()
                     pred.key.plot()      
-                    check_new_event (event_queue, pred.key, segment[1], p.key, intersections)
                     
                 if (succ and prim.intersect(succ.key.init, succ.key.to, segment[1].init, segment[1].to)):
                     print("Encontrei interseção com o succ")
-                    succ.key.hilight(color_line = 'yellow')
-                    segment[1].hilight(color_line = 'yellow')
-                    control.sleep()
+                    if(check_new_event (event_queue, segment[1], succ.key, p.key, intersections)):
+                        succ.key.hilight(color_line = 'yellow')
+                        segment[1].hilight(color_line = 'yellow')
+                        control.sleep()
                     segment[1].plot()
                     succ.key.plot()
-                    check_new_event (event_queue, segment[1], succ.key, p.key, intersections)
                     
             
                 if (pred): pred.key.plot()
@@ -180,12 +180,12 @@ def Bentley_ottman (segments_list):
             
                 if (prim.intersect(pred.key.init, pred.key.to, succ.key.init, succ.key.to)):
                     print("Encontrei interseção entre pred e succ")
-                    succ.key.hilight(color_line = 'yellow')
-                    pred.key.hilight(color_line = 'yellow')
-                    control.sleep()
+                    if(check_new_event (event_queue, pred.key, succ.key, p.key, intersections)):
+                        succ.key.hilight(color_line = 'yellow')
+                        pred.key.hilight(color_line = 'yellow')
+                        control.sleep()
                     pred.key.plot()
                     succ.key.plot()
-                    check_new_event (event_queue, pred.key, succ.key, p.key, intersections)
             
                 pred.key.plot()
                 succ.key.plot()
@@ -232,12 +232,12 @@ def Bentley_ottman (segments_list):
 
                 if(pred and prim.intersect(pred.key.init, pred.key.to, segment[1][1].init, segment[1][1].to)):
                     print("Encontrei interseção entre pred e segment[1]")
-                    pred.key.hilight(color_line = 'yellow')
-                    segment[1][1].hilight(color_line = 'yellow')
-                    control.sleep()
+                    if(check_new_event (event_queue, pred.key, segment[1][1], p.key, intersections)):
+                        pred.key.hilight(color_line = 'yellow')
+                        segment[1][1].hilight(color_line = 'yellow')
+                        control.sleep()
                     pred.key.plot()
                     segment[1][1].plot()
-                    check_new_event (event_queue, pred.key, segment[1][1], p.key, intersections)
 
                 if (pred): 
                     pred.key.plot()
@@ -255,12 +255,12 @@ def Bentley_ottman (segments_list):
 
                 if(succ and prim.intersect(succ.key.init, succ.key.to, segment[1][0].init, segment[1][0].to)):
                     print("Encontrei interseção entre succ e segment[0]")
-                    succ.key.hilight(color_line = 'yellow')
-                    segment[1][0].hilight(color_line = 'yellow')
-                    control.sleep()
+                    if(check_new_event(event_queue, segment[1][0], succ.key, p.key, intersections)):
+                        succ.key.hilight(color_line = 'yellow')
+                        segment[1][0].hilight(color_line = 'yellow')
+                        control.sleep()
                     segment[1][0].plot()
                     succ.key.plot()
-                    check_new_event (event_queue, segment[1][0], succ.key, p.key, intersections)
 
                 if (succ): 
                     succ.key.plot()
@@ -271,7 +271,8 @@ def Bentley_ottman (segments_list):
 def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
     "segment1 e segment2 se intersectam. Verifica se o ponto de interseção\
      já existe na PointBST. Se não existir, insere o ponto. Caso já exista,\
-     atualiza o ponto com um evento de interseção."    
+     atualiza o ponto com um evento de interseção.\
+     Devolve False se a interseção for ignorada e True c.c."    
     x,y = get_intersection(segment1, segment2)
     new_event = point.Point(x, y)
     print("----------Chamada da check_new_event-------------")
@@ -279,7 +280,7 @@ def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
     if (sweepline.x > new_event.x or new_event == sweepline):
         print("Vou ignorar a interseção")
         print("-------------------------------------------------")
-        return
+        return False
     else:
         intersections.append((segment1, segment2))
         print("Vou checar se o ponto de interseção já está na PointBST")
@@ -293,6 +294,7 @@ def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
             print("O ponto não existe na PointBST. Vou adicioná-lo")
             event_queue.insert(new_event, [[1, [segment1, segment2]]])
     print("-------------------------------------------------")
+    return True
 
 def filter_points (segments):
     "Separa os pontos extremos dos segmentos e os ordena na lista points."

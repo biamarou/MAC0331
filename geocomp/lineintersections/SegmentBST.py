@@ -124,7 +124,9 @@ class SegmentBST:
         elif (cmp > 0):
             return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node, remove)
         else:
-            if (node.key == key): return (node_dad, node, last_turn_left, last_turn_right)
+            if (node.key == key): 
+                print('search_node: encontrei o nó')
+                return (node_dad, node, last_turn_left, last_turn_right)
             else:
                 print('search_node: cmp deu igual, mas node.key!=key. Vou calcular um novo cmp.')
                 if (node.key.init == key.to):
@@ -133,7 +135,8 @@ class SegmentBST:
                     cmp = self.compare_to(key.init, node.key)
                 else:
                     cmp = self.compare_to(key.to, node.key)
-                    if(remove and node.key.init != key.init):
+                    if(remove and node.key.init != key.init and node.key.init.x != node.key.to.x and key.init.x !=
+                            key.to.x):
                         cmp = -cmp
                 print('search_node: meu novo cmp é: ' + str(cmp))
                 
@@ -210,7 +213,7 @@ class SegmentBST:
                 cmp = self.compare_to(segment.init, node.key)
             else:
                 cmp = self.compare_to(segment.to, node.key)
-                if (node.key.init != segment.init):
+                if (node.key.init != segment.init and node.key.init.x != node.key.to.x and segment.init.x != segment.to.x):
                     cmp = -cmp
 
             if (cmp < 0):
