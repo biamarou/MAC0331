@@ -66,12 +66,12 @@ def Bentley_ottman (segments_list):
         p = event_queue.removeMinKey()
         control.plot_delete(sweepline_id)
         sweepline_id = control.plot_vert_line(p.key.x, color='blue')
-        print('Removi mínimo da PointBST. A lista p.segment é:')
+        print('~~~~~~~~Removi mínimo da PointBST. A lista p.segment é:')
         print(p.segment)
         for segment in p.segment:
             # Um elemento de p.segment é da forma [e, l] onde e é
             # o código do evento e l é uma lista contendo um ou dois segmentos
-            print("Tratarei o ponto evento a seguir: ")
+            print("~~~Tratarei o ponto evento a seguir: ")
             print(segment)
             if (segment[0] == 0): #Evento de inserção
                 print("O ponto evento é ponta esquerda")
@@ -95,16 +95,16 @@ def Bentley_ottman (segments_list):
                     continue
             
                 if (pred):
-                    print("O pred é: [("+pred.key.init.x+","+pred.key.init.y+"), ("+pred.key.to.x+","+
-                            pred.key.to.y+")]")
+                    print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"), ("+str(pred.key.to.x)+","+
+                            str(pred.key.to.y)+")]")
                     print("Vou pintar o pred")
                     pred.key.hilight(color_line = 'magenta')
                 else:
                     print("Não encontrei pred")
 
                 if (succ): 
-                    print("O succ é: [("+succ.key.init.x+","+succ.key.init.y+"), ("+succ.key.to.x+","+
-                            succ.key.to.y+")]")
+                    print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"), ("+str(succ.key.to.x)+","+
+                            str(succ.key.to.y)+")]")
                     print("Vou pintar o succ")
                     succ.key.hilight(color_line = 'magenta')
                 else: 
@@ -147,22 +147,22 @@ def Bentley_ottman (segments_list):
                 succ = segment_tree.get_sucessor(segment[1], p.key)
             
                 if(pred):
-                    print("O pred é: [("+pred.key.init.x+","+pred.key.init.y+"), ("+pred.key.to.x+","+
-                            pred.key.to.y+")]")
+                    print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"), ("+str(pred.key.to.x)+","+
+                            str(pred.key.to.y)+")]")
                 else:
                     print("Não encontrei pred")
             
                 if (succ):
-                    print("O succ é: [("+succ.key.init.x+","+succ.key.init.y+"), ("+succ.key.to.x+","+
-                            succ.key.to.y+")]")
+                    print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"), ("+str(succ.key.to.x)+","+
+                            str(succ.key.to.y)+")]")
                 else:
                     print("Não encontrei succ")
                 
                 print("Vou imprimir a SegmentBST: ")
                 segment_tree.imprime()
                 print("Vou remover o segmento do qual sou ponta direita")
-                print("O segmento é: [("+segment[1].init.x+","+segment[1].init.y+"), ("+segment[1].to.x+","+
-                            segment[1].to.y+")]")
+                print("O segmento é: [("+str(segment[1].init.x)+","+str(segment[1].init.y)+"), ("+str(segment[1].to.x)+","+
+                            str(segment[1].to.y)+")]")
 
                 segment_tree.remove(segment[1], p.key)
                 print("Removi o segmento. Vou imprimir a SegmentBST: ")
@@ -193,10 +193,8 @@ def Bentley_ottman (segments_list):
 
             else: #Evento de interseção
                 print("O ponto evento é ponto de interseção dos seguintes segmentos: ")
-                print("O segment[0] é: [("+segment[1][0].init.x+","+segment[1][0].init.y+"), ("+segment[1][0].to.x+","+
-                            segment[1][0].to.y+")]")
-                print("O segment[1] é: [("+segment[1][1].init.x+","+segment[1][1].init.y+"), ("+segment[1][1].to.x+","+
-                            segment[1][1].to.y+")]")
+                print("O segment[0] é: [("+str(segment[1][0].init.x)+","+str(segment[1][0].init.y)+"),("+str(segment[1][0].to.x)+","+ str(segment[1][0].to.y)+")]")
+                print("O segment[1] é: [("+str(segment[1][1].init.x)+","+str(segment[1][1].init.y)+"),("+str(segment[1][1].to.x)+","+str(segment[1][1].to.y)+")]")
                 p.key.plot()
                 p.key.hilight('blue')
                 control.sleep()
@@ -223,7 +221,8 @@ def Bentley_ottman (segments_list):
                 succ = segment_tree.get_sucessor(segment[1][0], p.key)
 
                 if (pred):
-                    print("O pred é: [("+pred.key.init.x+","+pred.key.init.y+"),("+pred.key.to.x+","+ pred.key.to.y+")]")
+                    print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"),("+str(pred.key.to.x)+","+
+                            str(pred.key.to.y)+")]")
                     print("Vou pintar o segment[1] de verde e o pred de magenta")
                     segment[1][1].hilight(color_line = 'green') 
                     pred.key.hilight(color_line = 'magenta')
@@ -245,7 +244,8 @@ def Bentley_ottman (segments_list):
                     segment[1][1].plot()
             
                 if (succ): 
-                    print("O succ é: [("+succ.key.init.x+","+succ.key.init.y+"),("+succ.key.to.x+","+ succ.key.to.y+")]")
+                    print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"),("+str(succ.key.to.x)+","+
+                            str(succ.key.to.y)+")]")
                     print("Vou pintar o segment[0] de verde e o succ de magenta")
                     segment[1][0].hilight('green') 
                     succ.key.hilight(color_line = 'magenta')
@@ -275,9 +275,10 @@ def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
     x,y = get_intersection(segment1, segment2)
     new_event = point.Point(x, y)
     print("----------Chamada da check_new_event-------------")
-    print("O ponto de interseção é: (" + x + "," + y + ")")
+    print("O ponto de interseção é: (" + str(x) + "," + str(y) + ")")
     if (sweepline.x > new_event.x or new_event == sweepline):
         print("Vou ignorar a interseção")
+        print("-------------------------------------------------")
         return
     else:
         intersections.append((segment1, segment2))

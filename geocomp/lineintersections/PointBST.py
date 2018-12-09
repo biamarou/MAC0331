@@ -4,8 +4,7 @@ class PointBST:
     
     class Node:
         def __init__(self, k, h, s, r, l, sg):
-            # key is a point
-            self.key = k
+            self.key = k #key is a point
             self.height = h
             self.size = s
             self.right = r
@@ -40,10 +39,8 @@ class PointBST:
             node = node.left
         self.remove(node.key)
         return node
-    
 
     def insert (self, point, segment):
-        #We pass the segments of which the point is a vertice
         if (self.root == None):
             self.root = self.Node(point, 0, 1, None, None, segment)    
         else:
@@ -56,8 +53,6 @@ class PointBST:
             return -1
         return 0
 
-    # Assuming there aren't two equal points
-    # se tiver ponto igual os ponta esquerda sao menores
     def insert_aux (self, node, point, segment):
         if (node == None):
             return self.Node(point, 0, 1, None, None, segment)
@@ -136,7 +131,6 @@ class PointBST:
         if (self.contains(point)):
             self.root = self.remove_aux(self.root, point)
 
-    #Assuming there aren`t two equal points  
     def remove_aux(self, node, point):
         cmp = self.compare_to(node.key, point)
         if (cmp > 0): node.left = self.remove_aux(node.left, point)

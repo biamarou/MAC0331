@@ -5,8 +5,7 @@ class SegmentBST:
     
     class Node:
         def __init__(self, k, h, s, r, l):
-            # key is a segment
-            self.key = k
+            self.key = k #key is a segment
             self.height = h
             self.size = s
             self.right = r
@@ -37,7 +36,8 @@ class SegmentBST:
     def get_y_coord (self, l, r, x):
         return ((r.y - l.y)/(r.x - l.x)) * (x - (l.x)) + l.y
 
-    def compare_to (self, p, s): #devolve 1 se p estah ah esquerda de s.
+    def compare_to (self, p, s):
+        #devolve 1 se p está à esquerda de s.
         left_test = prim.float_left(s.init, s.to, p)
         left_on_test = prim.float_left_on(s.init, s.to, p)
 
@@ -45,13 +45,12 @@ class SegmentBST:
         elif (left_test): return 1
         else: return -1
 
-    def insert (self, segment, sweepline_point): #sweepline_point eh a x-coordenada da sweepline
+    def insert (self, segment, sweepline_point):
         if (self.root == None):
             self.root = self.Node(segment, 0, 1, None, None)    
         else:
             self.root = self.insert_aux(self.root, segment, sweepline_point)
 
-    # Assuming there aren't two equal segments
     def insert_aux (self, node, segment, sweepline_point):
         if (node == None):
             return self.Node(segment, 0, 1, None, None)
@@ -61,12 +60,12 @@ class SegmentBST:
         elif (cmp > 0):
             node.right = self.insert_aux(node.right, segment, sweepline_point)
 
-        else: #deu igual!
+        else:
             if (node.key.init == segment.to):
                     cmp = -self.compare_to(segment.init, node.key)
             elif(node.key.to == segment.to):
                 cmp = self.compare_to(segment.init, node.key)
-            else: #sweepline point eh intersecao propria, init = init, to = init
+            else:
                 cmp = self.compare_to(segment.to, node.key)
 
             if (cmp < 0):
@@ -119,26 +118,25 @@ class SegmentBST:
         if(node == None): return None
         
         cmp = self.compare_to(sweepline_point, node.key)
-        print('cmp ' + str(cmp))
+        print('search_node: cmp = ' + str(cmp))
         if (cmp < 0):
             return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right, remove)
         elif (cmp > 0):
             return self.search_node(node, node.right, key, sweepline_point, last_turn_left, node, remove)
-        else: #deu igual!
+        else:
             if (node.key == key): return (node_dad, node, last_turn_left, last_turn_right)
             else:
+                print('search_node: cmp deu igual, mas node.key!=key. Vou calcular um novo cmp.')
                 if (node.key.init == key.to):
                     cmp = -self.compare_to(key.init, node.key)
                 elif(node.key.to == key.to):
                     cmp = self.compare_to(key.init, node.key)
-                else: #sweepline point eh intersecao propria, init = init, to = init
+                else:
                     cmp = self.compare_to(key.to, node.key)
                     if(remove and node.key.init != key.init):
                         cmp = -cmp
-                # se vou remover preciso olhar a arvore com a referencia anterior
+                print('search_node: meu novo cmp é: ' + str(cmp))
                 
-                print('cmp deu igual-else ' + str(cmp))
-
                 if (cmp < 0):
                     return self.search_node(node, node.left, key, sweepline_point, node, last_turn_right, remove)
                 else: 
@@ -147,45 +145,47 @@ class SegmentBST:
 
 
     def get_predecessor(self, key, sweepline_point): 
-    #    se o noh tem subarvore esquerda :max(subarvore esquerda)
-    #                       cc se sou filho direito, meu pai eh antecessor
-    #                       cc nao tenho antecessor
-        print('node search pred')
+        "se o nó tem subarvore esquerda: max(subarvore esquerda)\
+         cc se sou filho direito, meu pai é  antecessor\
+         cc não tenho antecessor"
+        print('Estou na get_predecessor')
 
         search_list = self.search_node(None, self.root, key, sweepline_point, None, None)
         if(search_list == None):
-            print("DEU RUIM")
+            print("Não encontrei o segmento no get_predecessor")
             return False
         node = search_list[1]
         last_turn_right = search_list[3]
 
         if (node.left != None): 
+            print("Chamei max_aux no get_predecessor")
             return self.max_aux(node.left)
         
         elif(last_turn_right != None):
-                return last_turn_right
+            print("Devolvi last_turn_right no get_predecessor")
+            return last_turn_right
         return False
 
     def get_sucessor(self, key, sweepline_point): 
-    #    se o noh tem subarvore direita :min(subarvore direita)
-    #                       cc se sou filho esquerdo, meu pai eh sucessor
-    #                       cc nao tenho sucessor
-        print('node search succ')
+        "se o nó tem subarvore direita: min(subarvore direita)\
+        cc se sou filho esquerdo, meu pai é sucessor\
+        cc não tenho sucessor"
+        print('Estou na get_sucessor')
         
         search_list = self.search_node(None, self.root, key, sweepline_point, None, None)
         if(search_list == None):
-            print("DEU RUIM")
+            print("Não encontrei o segmento no get_sucessor")
             return False
 
         node = search_list[1]
         last_turn_left = search_list[2]
 
         if (node.right != None):
-            print("min_aux")
+            print("Chamei min_aux no get_sucessor")
             return self.min_aux(node.right)
     
         elif (last_turn_left != None):
-            print("last_turn_left")
+            print("Devolvi o last_turn_left no get_sucessor")
             return last_turn_left
         return False
 
@@ -193,7 +193,7 @@ class SegmentBST:
         if (self.search_node(None, self.root, segment, sweepline_point, None, None, True)):
             self.root = self.remove_aux(self.root, segment, sweepline_point)
         else:
-            print("There is no point!")
+            print("Não encontrei o segmento no remove")
             print(segment)
             print(self.search_node(None, self.root, segment, sweepline_point, None, None, True))
  
@@ -208,7 +208,7 @@ class SegmentBST:
                 cmp = -self.compare_to(segment.init, node.key)
             elif(node.key.to == segment.to):
                 cmp = self.compare_to(segment.init, node.key)
-            else: #sweepline point eh intersecao propria, init = init, to = init
+            else:
                 cmp = self.compare_to(segment.to, node.key)
                 if (node.key.init != segment.init):
                     cmp = -cmp
@@ -218,9 +218,9 @@ class SegmentBST:
             elif(cmp > 0): 
                 node.right = self.remove_aux(node.right, segment, sweepline_point)
             else:
-                print ("CMP DEU IGUAL REMOVE")
+                print ("cmp deu igual no remove, mas node.key!=segment")
         else:
-            print("achei o segmento!")
+            print("Encontrei o segmento no remove")
             print(node.key)
             if (node.left == None):
                 return node.right
@@ -274,5 +274,5 @@ class SegmentBST:
         self.imprime_aux(node.right)
 
     def imprime_seg(self, s):
-        segment = 'init ' + str([s.init.x, s.init.y]) + ' to ' + str([s.to.x, s.to.y]) 
+        segment = 'init: ' + str([s.init.x, s.init.y]) + ', to: ' + str([s.to.x, s.to.y]) 
         print(segment)
