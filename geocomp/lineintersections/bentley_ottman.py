@@ -24,6 +24,16 @@ def cmp_sort_event_point (a, b):
      Queremos tratá-los em ordem crescente de código."
     if (a[0] < b[0]): return -1
     elif (a[0] > b[0]): return 1
+    elif (a[0] == 0):
+        if(prim.left(b[1].init, b[1].to, a[1].to)):
+            return 1
+        else:
+            return -1
+    elif (a[0] == 2):
+        if(prim.left(b[1].init, b[1].to, a[1].init)):
+            return 1
+        else:
+            return -1
     return 0
 
 def insert_point_segment (event_queue, points, segments):
