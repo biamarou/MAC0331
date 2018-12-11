@@ -17,14 +17,23 @@ def which_point (point, segment):
         return 2
     return 1
 
-def cmp_sort_event_point (a, b):
-    "Usado para comparar os códigos dos eventos, que\
-     pertencem a {0, 1, 2}, onde 0 significa inserção,\
-     1 significa interseção e 2 significa remoção.\
-     Queremos tratá-los em ordem crescente de código."
-    if (a[0] < b[0]): return -1
-    elif (a[0] > b[0]): return 1
-    return 0
+def cmp_sort_insertion_segments (a, b):
+    if(prim.left(b.init, b.to, a.to)):
+        return 1
+    else:
+        return -1
+
+def cmp_sort_remove_segments (a, b):
+    if(prim.left(b.init, b.to, a.init)):
+        return 1
+    else:
+        return -1
+
+def cmp_sort_intersection_segments (a, b):
+    if(prim.left(b.init, b.to, a.to)):
+        return 1
+    else:
+        return -1
 
 def insert_point_segment (event_queue, points, segments):
     "event_queue é uma PointBST, segments é uma lista de Segment e\
@@ -36,26 +45,35 @@ def insert_point_segment (event_queue, points, segments):
     j = 1
     size = len(points)
     while (i < size):
+        insertion = []
+        remove = []
         w = which_point(points[i][0], segments[points[i][1]])
-        points_by_segment = [[w, segments[points[i][1]]]]
-        
+        if (w == 0):
+            insertion.append(segments[points[i][1]])
+        elif (w == 2):
+            remove.append(segments[points[i][1]])
+
         while (j < size and points[i][0] == points[j][0]):
             w = which_point(points[j][0], segments[points[j][1]])
-            points_by_segment.append([w, segments[points[j][1]]])
+            if (w == 0):
+                insertion.append(segments[points[j][1]])
+            elif (w == 2):
+                remove.append(segments[points[j][1]])
             j += 1
         
-        points_by_segment.sort(key=tools.cmp_to_key(cmp_sort_event_point))
-        event_queue.insert(points[i][0], points_by_segment)
+        insertion.sort(key=tools.cmp_to_key(cmp_sort_insertion_segments))
+        remove.sort(key=tools.cmp_to_key(cmp_sort_remove_segments))
+
+        event_queue.insert(points[i][0], [insertion, [], remove])
         i = j
         j += 1
 
 def Bentley_ottman (segments_list):
     points_list = filter_points(segments_list)
-    intersections = []
+    intersection_points = []
     event_queue = PBST.PointBST()  
     segment_tree = SBST.SegmentBST()
     sweepline_id = None
-    
     
     for s in segments_list:
         s.plot()
@@ -63,238 +81,165 @@ def Bentley_ottman (segments_list):
     insert_point_segment(event_queue, points_list, segments_list)
 
     while(not event_queue.isEmpty()):
-        p = event_queue.removeMinKey()
+        event_node = event_queue.removeMinKey()
         control.plot_delete(sweepline_id)
-        sweepline_id = control.plot_vert_line(p.key.x, color='blue')
-        print('~~~~~~~~Removi mínimo da PointBST. A lista p.segment é:')
-        print(p.segment)
-        for segment in p.segment:
-            # Um elemento de p.segment é da forma [e, l] onde e é
-            # o código do evento e l é uma lista contendo um ou dois segmentos
-            print("~~~Tratarei o ponto evento a seguir: ")
-            print(segment)
-            if (segment[0] == 0): #Evento de inserção
-                print("O ponto evento é ponta esquerda")
-                p.key.hilight(color = 'blue')
+        sweepline_id = control.plot_vert_line(event_node.key.x, color='blue')
+        print("~~~O ponto evento é: (" + str(event_node.key.x) + ", " +  str(event_node.key.y) + ")")
+        print("Sua lista de inserções é: ")
+        print(event_node.segment[0])
+        print("Sua lista de interseções é: ")
+        print(event_node.segment[1])
+        print("Sua lista de remoções é: ")
+        print(event_node.segment[2])
+
+        if (len(event_node.segment[0]) + len(event_node.segment[1]) + len(event_node.segment[2]) > 1):
+            print("Entrei no primeiro if")
+            print("Vou imprimir a SegmentBST: ")
+            segment_tree.imprime()
+
+            intersection_points.append(event_node.key)
+            for segment in event_node.segment[0]:
+                segment.hilight(color_line="yellow")
+            for segment in event_node.segment[1]:
+                segment.hilight(color_line="yellow")
+            for segment in event_node.segment[2]:
+                segment.hilight(color_line="yellow") 
+            for segment in event_node.segment[1]:
+                segment_tree.remove(segment, event_node.key)
+            for segment in event_node.segment[2]:
+                segment_tree.remove(segment, event_node.key)
+            for segment in event_node.segment[0]:
+                segment_tree.insert(segment, event_node.key)
+            for segment in event_node.segment[1]:
+                segment_tree.insert(segment, event_node.key)
+            
+            print("Vou imprimir a SegmentBST: ")
+            segment_tree.imprime()
+
+            control.sleep()
+            for segment in event_node.segment[0]:
+                segment.plot()
+            for segment in event_node.segment[1]:
+                segment.plot()
+            for segment in event_node.segment[2]:
+                segment.plot() 
+
+        if (len(event_node.segment[0]) + len(event_node.segment[1]) == 0):
+            print("Entrei no segundo if")
+            lower = event_node.segment[2][0]
+            upper = event_node.segment[2][len(event_node.segment[2]) - 1]
+            if(lower):
+                print("O lower é: ")
+                print(lower)
+                print("O upper é: ")
+                print(upper)
+                lower.hilight(color_line="green")
+                upper.hilight(color_line="green")
                 control.sleep()
                 print("Vou imprimir a SegmentBST: ")
                 segment_tree.imprime()
-                print("Vou inserir o ponto evento na SegmentBST")
-                segment_tree.insert(segment[1], p.key)
-                print("Vou imprimir a SegmentBST após a inserção: ")
-                segment_tree.imprime()
-                print("Vou procurar o pred do ponto evento")
-                pred = segment_tree.get_predecessor(segment[1], p.key)
+                pred = segment_tree.get_predecessor(lower, event_node.key)
+                succ = segment_tree.get_sucessor(upper, event_node.key)
+                if (pred and succ):
+                    pred.key.hilight(color_line="magenta")
+                    succ.key.hilight(color_line="magenta")
+                    find_new_event(pred.key, succ.key, event_node.key, event_queue)
 
-                print("Vou procurar o succ do ponto evento")
-                succ = segment_tree.get_sucessor(segment[1], p.key)
-
-                if (not pred and not succ):
-                    print("Não encontrei pred nem succ")
-                    p.key.hilight('red')
-                    continue
-            
-                if (pred):
-                    print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"), ("+str(pred.key.to.x)+","+
-                            str(pred.key.to.y)+")]")
-                    print("Vou pintar o pred")
-                    pred.key.hilight(color_line = 'magenta')
-                else:
-                    print("Não encontrei pred")
-
-                if (succ): 
-                    print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"), ("+str(succ.key.to.x)+","+
-                            str(succ.key.to.y)+")]")
-                    print("Vou pintar o succ")
-                    succ.key.hilight(color_line = 'magenta')
-                else: 
-                    print("Não encontrei succ")
                 control.sleep()
+                if(succ): succ.key.plot()
+                if(pred): pred.key.plot()
+                lower.plot()
+                upper.plot()
+            for segment in event_node.segment[2]:
+                segment_tree.remove(segment, event_node.key)
+        else:
+            print("Entrei no else")
+            if (len(event_node.segment[0]) == 1 and len(event_node.segment[0]) + len(event_node.segment[1]) + len(event_node.segment[2]) <= 1):
+                print("Tenho um segmento para inserir")
+                segment_tree.insert(event_node.segment[0][0], event_node.key)
+            print("Vou imprimir a SegmentBST: ")
+            segment_tree.imprime()
 
-                if (pred and prim.intersect(pred.key.init, pred.key.to, segment[1].init, segment[1].to)):
-                    print("Encontrei interseção com o pred")
-                    if(check_new_event (event_queue, pred.key, segment[1], p.key, intersections)):
-                        pred.key.hilight(color_line = 'yellow')
-                        segment[1].hilight(color_line = 'yellow')
-                        control.sleep()
-                    segment[1].plot()
-                    pred.key.plot()      
-                    
-                if (succ and prim.intersect(succ.key.init, succ.key.to, segment[1].init, segment[1].to)):
-                    print("Encontrei interseção com o succ")
-                    if(check_new_event (event_queue, segment[1], succ.key, p.key, intersections)):
-                        succ.key.hilight(color_line = 'yellow')
-                        segment[1].hilight(color_line = 'yellow')
-                        control.sleep()
-                    segment[1].plot()
-                    succ.key.plot()
-                    
+            lower = get_lower_segment(event_node.segment[0], event_node.segment[1])
+            print("O lower é: ")
+            print(lower)
+            lower.hilight(color_line="green")
+            pred = segment_tree.get_predecessor(lower, event_node.key)
+            if (pred):
+                pred.key.hilight(color_line="magenta")
+                find_new_event(pred.key, lower, event_node.key, event_queue)
             
-                if (pred): pred.key.plot()
-                if (succ): succ.key.plot()
-                segment[1].init.hilight('red')
+            control.sleep()
+            if(pred): pred.key.plot() 
+            lower.plot()
 
-            elif (segment[0] == 2): #Evento de remoção
-                print("O ponto evento é ponta direita")
-                segment[1].to.hilight(color = 'blue')
-                control.sleep()
-                print("Vou imprimir a SegmentBST: ")
-                segment_tree.imprime()
-
-                print("Vou procurar o pred")
-                pred = segment_tree.get_predecessor(segment[1], p.key)
-                print("Vou procurar o succ")
-                succ = segment_tree.get_sucessor(segment[1], p.key)
+            upper = get_upper_segment(event_node.segment[0], event_node.segment[1])
+            print("O upper é: ")
+            print(upper)
+            upper.hilight(color_line="green")
+            succ = segment_tree.get_sucessor(upper, event_node.key)
+            if (succ):
+                succ.key.hilight(color_line="magenta")
+                find_new_event(upper, succ.key, event_node.key, event_queue)
             
-                if(pred):
-                    print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"), ("+str(pred.key.to.x)+","+
-                            str(pred.key.to.y)+")]")
-                else:
-                    print("Não encontrei pred")
+            control.sleep()
+            if(succ): succ.key.plot()
+            upper.plot()
             
-                if (succ):
-                    print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"), ("+str(succ.key.to.x)+","+
-                            str(succ.key.to.y)+")]")
-                else:
-                    print("Não encontrei succ")
-                
-                print("Vou imprimir a SegmentBST: ")
-                segment_tree.imprime()
-                print("Vou remover o segmento do qual sou ponta direita")
-                print("O segmento é: [("+str(segment[1].init.x)+","+str(segment[1].init.y)+"), ("+str(segment[1].to.x)+","+
-                            str(segment[1].to.y)+")]")
+            for segment in event_node.segment[2]:
+                segment_tree.remove(segment, event_node.key)
 
-                segment_tree.remove(segment[1], p.key)
-                print("Removi o segmento. Vou imprimir a SegmentBST: ")
-                segment_tree.imprime()
+    for point in intersection_points:
+        point.plot("yellow")
 
-                if(not pred or not succ):
-                    p.key.hilight('red')
-                    continue
-                
-                print("Vou pintar o pred")
-                pred.key.hilight(color_line = 'magenta')
-                print("Vou pintar o succ")
-                succ.key.hilight(color_line = 'magenta')
-                control.sleep()
-            
-                if (prim.intersect(pred.key.init, pred.key.to, succ.key.init, succ.key.to)):
-                    print("Encontrei interseção entre pred e succ")
-                    if(check_new_event (event_queue, pred.key, succ.key, p.key, intersections)):
-                        succ.key.hilight(color_line = 'yellow')
-                        pred.key.hilight(color_line = 'yellow')
-                        control.sleep()
-                    pred.key.plot()
-                    succ.key.plot()
-            
-                pred.key.plot()
-                succ.key.plot()
-                segment[1].to.hilight('red')
+def get_lower_segment(list1, list2):
+    if(list1):
+        lower = list1[0]
+        for segment in list2:
+            if (prim.left(segment.init, segment.to, lower.to)):
+                lower = segment
+        return lower
+    return list2[0]
 
-            else: #Evento de interseção
-                print("O ponto evento é ponto de interseção dos seguintes segmentos: ")
-                print("O segment[0] é: [("+str(segment[1][0].init.x)+","+str(segment[1][0].init.y)+"),("+str(segment[1][0].to.x)+","+ str(segment[1][0].to.y)+")]")
-                print("O segment[1] é: [("+str(segment[1][1].init.x)+","+str(segment[1][1].init.y)+"),("+str(segment[1][1].to.x)+","+str(segment[1][1].to.y)+")]")
-                p.key.plot()
-                p.key.hilight('blue')
-                control.sleep()
-                print("Vou imprimir a SegmentBST: ")
-                segment_tree.imprime()
+def get_upper_segment(list1, list2):
+    if(list1):
+        upper = list1[len(list1) - 1]
+        for segment in list2:
+            if (prim.left(upper.init, upper.to, segment.to)):
+                upper = segment
+        return upper
+    return list2[len(list2) - 1]
 
-                print("Vou remover o segment[0]")
-                segment_tree.remove(segment[1][0], p.key)
-                print("Vou remover o segment[1]")
-                segment_tree.remove(segment[1][1], p.key)
-                print("Vou imprimir a SegmentBST após a remoção do segment[0] e segment[1]: ")
-                segment_tree.imprime()
+def find_new_event(segment1, segment2, sweepline, event_queue):
+    print("find_new_event: Recebi os seguintes argumentos: ")
+    print(segment1)
+    print(segment2)
+    print(sweepline)
 
-                print("Vou inserir o segment[1]")
-                segment_tree.insert(segment[1][1], p.key)
-                print("Vou inserir o segment[0]")
-                segment_tree.insert(segment[1][0], p.key)
-                print("Vou imprimir a SegmentBST após a inserção do segment[1] e segment[0]: ")
-                segment_tree.imprime()
+    if(not prim.intersect(segment1.init, segment1.to, segment2.init, segment2.to)):
+        print("find_new_event: segment1 e segment2 não se intersectam")
+        return
 
-                print("Vou procurar o pred")
-                pred = segment_tree.get_predecessor(segment[1][1], p.key)
-                print("Vou procurar o succ")
-                succ = segment_tree.get_sucessor(segment[1][0], p.key)
-
-                if (pred):
-                    print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"),("+str(pred.key.to.x)+","+
-                            str(pred.key.to.y)+")]")
-                    print("Vou pintar o segment[1] de verde e o pred de magenta")
-                    segment[1][1].hilight(color_line = 'green') 
-                    pred.key.hilight(color_line = 'magenta')
-                    control.sleep()
-                else:
-                    print("Não encontrei pred")
-
-                if(pred and prim.intersect(pred.key.init, pred.key.to, segment[1][1].init, segment[1][1].to)):
-                    print("Encontrei interseção entre pred e segment[1]")
-                    if(check_new_event (event_queue, pred.key, segment[1][1], p.key, intersections)):
-                        pred.key.hilight(color_line = 'yellow')
-                        segment[1][1].hilight(color_line = 'yellow')
-                        control.sleep()
-                    pred.key.plot()
-                    segment[1][1].plot()
-
-                if (pred): 
-                    pred.key.plot()
-                    segment[1][1].plot()
-            
-                if (succ): 
-                    print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"),("+str(succ.key.to.x)+","+
-                            str(succ.key.to.y)+")]")
-                    print("Vou pintar o segment[0] de verde e o succ de magenta")
-                    segment[1][0].hilight('green') 
-                    succ.key.hilight(color_line = 'magenta')
-                    control.sleep()
-                else:
-                    print("Não encontrei succ")
-
-                if(succ and prim.intersect(succ.key.init, succ.key.to, segment[1][0].init, segment[1][0].to)):
-                    print("Encontrei interseção entre succ e segment[0]")
-                    if(check_new_event(event_queue, segment[1][0], succ.key, p.key, intersections)):
-                        succ.key.hilight(color_line = 'yellow')
-                        segment[1][0].hilight(color_line = 'yellow')
-                        control.sleep()
-                    segment[1][0].plot()
-                    succ.key.plot()
-
-                if (succ): 
-                    succ.key.plot()
-                    segment[1][0].plot()
-
-                p.key.hilight('red')
-
-def check_new_event (event_queue, segment1, segment2, sweepline, intersections):
-    "segment1 e segment2 se intersectam. Verifica se o ponto de interseção\
-     já existe na PointBST. Se não existir, insere o ponto. Caso já exista,\
-     atualiza o ponto com um evento de interseção.\
-     Devolve False se a interseção for ignorada e True c.c."    
+    print("find_new_event: segment1 e segment2 se intersectam")
     x,y = get_intersection(segment1, segment2)
     new_event = point.Point(x, y)
-    print("----------Chamada da check_new_event-------------")
-    print("O ponto de interseção é: (" + str(x) + "," + str(y) + ")")
-    if (sweepline.x > new_event.x or new_event == sweepline):
-        print("Vou ignorar a interseção")
-        print("-------------------------------------------------")
-        return False
-    else:
-        intersections.append((segment1, segment2))
-        print("Vou checar se o ponto de interseção já está na PointBST")
-        node_point = event_queue.contains(new_event)
 
+    if (new_event.x > sweepline.x or (new_event.x == sweepline.x and new_event.y > sweepline.y)):
+        print("find_new_event: não vou ignorar a interseção")
+        node_point = event_queue.contains(new_event)
         if (node_point):
-            print("O ponto já existe na PointBST")
-            node_point.segment.append([1, [segment1, segment2]])
-            node_point.segment.sort(key=tools.cmp_to_key(cmp_sort_event_point))
+            print("find_new_event: o ponto de interseção já existia na PointBST")
+            node_point.segment[1].append(segment1)
+            node_point.segment[1].append(segment2)
+            node_point.segment[1].sort(key=tools.cmp_to_key(cmp_sort_intersection_segments))
         else:
-            print("O ponto não existe na PointBST. Vou adicioná-lo")
-            event_queue.insert(new_event, [[1, [segment1, segment2]]])
-    print("-------------------------------------------------")
-    return True
+            print("find_new_event: o ponto de interseção não existia na PointBST")
+            if(prim.left(segment1.init, segment1.to, segment2.to)):
+                new_segment_list = [segment1, segment2]
+            else:
+                new_segment_list = [segment2, segment1]
+            event_queue.insert(new_event, [[], new_segment_list, []])
+    else: print("find_new_event: Decidi ignorar a interseção")
 
 def filter_points (segments):
     "Separa os pontos extremos dos segmentos e os ordena na lista points."
@@ -310,6 +255,8 @@ def filter_points (segments):
         points.append([segments[i].init, i])
         points.append([segments[i].to, i])
     points.sort(key=tools.cmp_to_key(cmp_sort_point))
+    print("Points: ")
+    print(points)
     return points
 
 def cmp_sort_point (a, b):
@@ -349,3 +296,166 @@ def get_intersection(r, s):
     y = delta_r * (x - r.init.x) + r.init.y
 
     return (x, y)
+
+def insertion_event(event_point, segment, segment_tree, event_queue):
+    print("O ponto evento é ponta esquerda")
+    event_point.hilight(color = 'blue')
+    control.sleep()
+    print("Vou imprimir a SegmentBST: ")
+    segment_tree.imprime()
+    print("Vou inserir o ponto evento na SegmentBST")
+    segment_tree.insert(segment, event_point)
+    print("Vou imprimir a SegmentBST após a inserção: ")
+    segment_tree.imprime()
+    print("Vou procurar o pred do ponto evento")
+    pred = segment_tree.get_predecessor(segment, event_point)
+
+    print("Vou procurar o succ do ponto evento")
+    succ = segment_tree.get_sucessor(segment, event_point)
+
+    if (not pred and not succ):
+        print("Não encontrei pred nem succ")
+        event_point.hilight('red')
+        return
+            
+    if (pred):
+        print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"), ("+str(pred.key.to.x)+","+ str(pred.key.to.y)+")]")
+        print("Vou pintar o pred")
+        pred.key.hilight(color_line = 'magenta')
+    else:
+        print("Não encontrei pred")
+
+    if (succ): 
+        print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"), ("+str(succ.key.to.x)+","+ str(succ.key.to.y)+")]")
+        print("Vou pintar o succ")
+        succ.key.hilight(color_line = 'magenta')
+    else: 
+        print("Não encontrei succ")
+        control.sleep()
+
+    if (pred and prim.intersect(pred.key.init, pred.key.to, segment.init, segment.to)):
+        print("Encontrei interseção com o pred")
+        add_intersection(pred.key, segment)
+                    
+    if (succ and prim.intersect(succ.key.init, succ.key.to, segment.init, segment.to)):
+        print("Encontrei interseção com o succ")
+        add_intersection(succ.key, segment)
+                   
+    segment.plot() 
+    if (pred): pred.key.plot()
+    if (succ): succ.key.plot()
+    segment.init.hilight('red')
+
+
+def remove_event(event_point, segment, segment_tree, event_queue):
+    print("O ponto evento é ponta direita")
+    segment.to.hilight(color = 'blue')
+    control.sleep()
+    print("Vou imprimir a SegmentBST: ")
+    segment_tree.imprime()
+
+    print("Vou procurar o pred")
+    pred = segment_tree.get_predecessor(segment, p.key)
+    print("Vou procurar o succ")
+    succ = segment_tree.get_sucessor(segment, p.key)
+            
+    if(pred):
+        print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"), ("+str(pred.key.to.x)+","+ str(pred.key.to.y)+")]")
+    else:
+        print("Não encontrei pred")
+            
+    if (succ):
+        print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"), ("+str(succ.key.to.x)+","+ str(succ.key.to.y)+")]")
+    else:
+        print("Não encontrei succ")
+                
+        print("Vou imprimir a SegmentBST: ")
+        segment_tree.imprime()
+        print("Vou remover o segmento do qual sou ponta direita")
+        print("O segmento é: [("+str(segment.init.x)+","+str(segment.init.y)+"), ("+str(segment.to.x)+","+ str(segment.to.y)+")]")
+
+        segment_tree.remove(segment, event_point)
+        print("Removi o segmento. Vou imprimir a SegmentBST: ")
+        segment_tree.imprime()
+
+        if(not pred or not succ):
+            event_point.hilight('red')
+            return
+                
+        print("Vou pintar o pred")
+        pred.key.hilight(color_line = 'magenta')
+        print("Vou pintar o succ")
+        succ.key.hilight(color_line = 'magenta')
+        control.sleep()
+            
+        if (prim.intersect(pred.key.init, pred.key.to, succ.key.init, succ.key.to)):
+            check_new_event(pred.key, succ.key)
+            
+        pred.key.plot()
+        succ.key.plot()
+        segment.to.hilight('red')
+
+def intersection_event():
+    print("O ponto evento é ponto de interseção dos seguintes segmentos: ")
+    print("O segment[0] é: [("+str(segment[1][0].init.x)+","+str(segment[1][0].init.y)+"),("+str(segment[1][0].to.x)+","+ str(segment[1][0].to.y)+")]")
+    print("O segment[1] é: [("+str(segment[1][1].init.x)+","+str(segment[1][1].init.y)+"),("+str(segment[1][1].to.x)+","+str(segment[1][1].to.y)+")]")
+    p.key.plot()
+    p.key.hilight('blue')
+    control.sleep()
+    print("Vou imprimir a SegmentBST: ")
+    segment_tree.imprime()
+
+    print("Vou remover o segment[0]")
+    segment_tree.remove(segment[1][0], p.key)
+    print("Vou remover o segment[1]")
+    segment_tree.remove(segment[1][1], p.key)
+    print("Vou imprimir a SegmentBST após a remoção do segment[0] e segment[1]: ")
+    segment_tree.imprime()
+
+    print("Vou inserir o segment[1]")
+    segment_tree.insert(segment[1][1], p.key)
+    print("Vou inserir o segment[0]")
+    segment_tree.insert(segment[1][0], p.key)
+    print("Vou imprimir a SegmentBST após a inserção do segment[1] e segment[0]: ")
+    segment_tree.imprime()
+
+    print("Vou procurar o pred")
+    pred = segment_tree.get_predecessor(segment[1][1], p.key)
+    print("Vou procurar o succ")
+    succ = segment_tree.get_sucessor(segment[1][0], p.key)
+
+    if (pred):
+        print("O pred é: [("+str(pred.key.init.x)+","+str(pred.key.init.y)+"),("+str(pred.key.to.x)+","+ str(pred.key.to.y)+")]")
+        print("Vou pintar o segment[1] de verde e o pred de magenta")
+        segment[1][1].hilight(color_line = 'green') 
+        pred.key.hilight(color_line = 'magenta')
+        control.sleep()
+    else:
+        print("Não encontrei pred")
+
+    if(pred and prim.intersect(pred.key.init, pred.key.to, segment[1][1].init, segment[1][1].to)):
+        print("Encontrei interseção entre pred e segment[1]")
+        check_new_event (event_queue, pred.key, segment[1][1], p.key, intersections)
+
+    if (pred): 
+        pred.key.plot()
+        segment[1][1].plot()
+            
+    if (succ): 
+        print("O succ é: [("+str(succ.key.init.x)+","+str(succ.key.init.y)+"),("+str(succ.key.to.x)+","+ str(succ.key.to.y)+")]")
+        print("Vou pintar o segment[0] de verde e o succ de magenta")
+        segment[1][0].hilight('green') 
+        succ.key.hilight(color_line = 'magenta')
+        control.sleep()
+    else:
+        print("Não encontrei succ")
+
+    if(succ and prim.intersect(succ.key.init, succ.key.to, segment[1][0].init, segment[1][0].to)):
+        print("Encontrei interseção entre succ e segment[0]")
+        check_new_event(event_queue, segment[1][0], succ.key, p.key, intersections)
+
+    if (succ): 
+        succ.key.plot()
+        segment[1][0].plot()
+
+    p.key.hilight('red')

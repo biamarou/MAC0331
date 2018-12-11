@@ -267,8 +267,12 @@ class SegmentBST:
         return self.max_aux(node.right)
 
     def imprime(self):
+        if (self.root == None): return
+        print_root = 'init: ' + str([self.root.key.init.x, self.root.key.init.y]) + ', to: ' + str([self.root.key.to.x,
+            self.root.key.to.y]) 
+        print("A raíz é: " + print_root )
         self.imprime_aux(self.root)
-    
+        
     def imprime_aux(self, node):
         if (node == None):
             return
