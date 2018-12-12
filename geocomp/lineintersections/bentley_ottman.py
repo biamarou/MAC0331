@@ -19,12 +19,16 @@ def which_point (point, segment):
     return 1
 
 def cmp_sort_insertion_segments (a, b):
+    "função de comparação para segmentos que compartilham a mesma\
+     ponta esquerda"
     if(prim.left(b.init, b.to, a.to)):
         return 1
     else:
         return -1
 
 def cmp_sort_remove_segments (a, b):
+    "função de comparação para segmentos que compartilham a mesma\
+     ponta direita"   
     if(prim.left(b.init, b.to, a.init)):
         return 1
     else:
@@ -185,7 +189,10 @@ def Bentley_ottman (segments_list):
         point.plot("yellow")
 
 def get_lower_segment(list0, interBST):
-    
+    "list0 é uma lista ordenada dos segmentos que contém o ponto\
+    evento como ponta esquerda e interBST é uma BST dos segmentos\
+    que contém o ponto evento em seu interior.\
+    Retorna o segmento mais abaixo dentre os elementos da lista e da BST." 
     if (not interBST.isEmpty()):
         lower = interBST.min().key
         if (not list0 or prim.left(lower.init, lower[0].to, list0[0].to)):
@@ -193,6 +200,10 @@ def get_lower_segment(list0, interBST):
     return list0[0]
 
 def get_upper_segment(list0, interBST):
+    "list0 é uma lista ordenada dos segmentos que contém o ponto\
+    evento como ponta esquerda e interBST é uma BST dos segmentos\
+    que contém o ponto evento em seu interior.\
+    Retorna o segmento mais acima dentre os elementos da lista e da BST." 
     if(not interBST.isEmpty()):
         upper = interBST.max().key
         if (not list0 or not prim.left(upper.init, upper.to, list0[len(list0) - 1].to)):
@@ -200,6 +211,10 @@ def get_upper_segment(list0, interBST):
     return list0[len(list0) - 1]
 
 def find_new_event(segment1, segment2, sweepline, event_queue):
+    "segment1 e segment2 são segmentos que podem se intersectar.\
+    sweepline é o ponto evento atual e event_queue é a PointBST.\
+    Verifica se os segmentos se intersectam e cria um novo ponto\
+    evento se necessário."
     print("find_new_event: Recebi os seguintes argumentos: ")
     print(segment1)
     print(segment2)

@@ -53,7 +53,6 @@ class IntersectionBST:
         else:
             self.root = self.insert_aux(self.root, segment)
     
-
     def insert_aux (self, node, segment):
         if (node == None):
             return self.Node(segment, 0, 1, None, None)
