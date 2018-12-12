@@ -165,12 +165,12 @@ class IntersectionBST:
 
     def max(self):
         if (not self.isEmpty()):
-            return self.min_aux(self.root)
+            return self.max_aux(self.root)
 
     def max_aux(self, node):
         if(node.right == None):
             return node
-        return self.min_aux(node.right)
+        return self.max_aux(node.right)
 
     def imprime(self):
         if (self.root == None): return
@@ -213,6 +213,6 @@ class IntersectionBST:
     def insert_in_sweepline_aux(self, segment_tree, event_key, node):
         if (node == None): return
 
-        self.remove_from_sweepline_aux(segment_tree, event_key, node.left)
+        self.insert_in_sweepline_aux(segment_tree, event_key, node.left)
         segment_tree.insert(node.key, event_key)
-        self.remove_from_sweepline_aux(segment_tree, event_key, node.right)
+        self.insert_in_sweepline_aux(segment_tree, event_key, node.right)

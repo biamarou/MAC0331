@@ -196,7 +196,7 @@ class SegmentBST:
         if (self.search_node(None, self.root, segment, sweepline_point, None, None, True)):
             self.root = self.remove_aux(self.root, segment, sweepline_point)
         else:
-            print("Não encontrei o segmento no remove")
+            print("Não encontrei o segmento no search node")
             print(segment)
             print(self.search_node(None, self.root, segment, sweepline_point, None, None, True))
  
