@@ -1,5 +1,6 @@
 from geocomp.common import segment
 from geocomp.common import prim
+from geocomp.common import guiprim
 
 class SegmentBST:
     
@@ -38,8 +39,8 @@ class SegmentBST:
 
     def compare_to (self, p, s):
         #devolve 1 se p está à esquerda de s.
-        left_test = prim.float_left(s.init, s.to, p)
-        left_on_test = prim.float_left_on(s.init, s.to, p)
+        left_test = guiprim.float_left(s.init, s.to, p)
+        left_on_test = guiprim.float_left_on(s.init, s.to, p)
 
         if (left_on_test): return 0
         elif (left_test): return 1

@@ -5,6 +5,7 @@ from . import control
 from . import prim
 from geocomp import config
 
+ERR = 1.0e-5
 
 def triang (a, b, c):
 	"desenha  (e apaga) os lados do triangulo abc"
@@ -43,6 +44,19 @@ def area2 (a, b, c):
 	ret = prim.area2 (a, b, c)
 	triang (a, b, c)
 	return ret
+
+def float_left (a, b, c):
+    "Verdadeiro se c está à esquerda do segmento orientado ab utilizando comparacao de float"
+    ret = prim.float_left(a, b, c)
+    triang (a, b, c)
+    return ret
+
+def float_left_on (a, b, c):
+    "Verdadeiro se c está à esquerda ou sobre o segmento orientado ab utilizando comparacao de float"
+    ret = prim.float_left_on(a, b, c)
+    triang (a, b, c)
+    return ret
+
 
 def left (a, b, c):
 	"retorna verdadeiro se c esta a esquerda do segmento ab"
